@@ -1,7 +1,5 @@
-import { promisify } from 'util'
-import { access } from 'fs'
-
-const accessPromisified = promisify(access)
+import { promises } from 'fs'
+const { access } = promises
 
 /**
  * Check if a given path exists
@@ -9,7 +7,7 @@ const accessPromisified = promisify(access)
 export const pathExists = async (path: string): Promise<boolean> => {
   let pathExists: boolean
   try {
-    await accessPromisified(path)
+    await access(path)
     pathExists = true
   } catch (error) {
     pathExists = false

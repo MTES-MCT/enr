@@ -1,5 +1,6 @@
 export * from './Queue'
 export * from './Result'
+export * from './validators'
 export * from './logger'
 export * from './validators'
 export * from './wrapInfra'
