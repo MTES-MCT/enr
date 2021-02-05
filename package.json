@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "./node_modules/typescript/bin/tsc && cp -R src/public dist/src && cp -R src/views/template dist/src/views",
-    "install": "npm run build && npx sequelize-cli db:migrate",
+    "build:front": "webpack --config=webpack.config.js",
+    "install": "npm run build:front && npm run build && npx sequelize-cli db:migrate",
     "test": "NODE_ENV=unit-test jest --config=jest.unit.config.js --detectOpenHandles",
     "test-e2e": "NODE_ENV=test start-server-and-test watch http://localhost:3000 cy:run",
     "test-int": "NODE_ENV=test jest --config=jest.integration.config.js --detectOpenHandles",
@@ -15,7 +16,7 @@
     "storybook": "start-storybook -s ./src/public ",
     "storybook-build": "build-storybook-c .storybook -o docs",
     "start": "node ./dist/src/index.js",
-    "watch": "./node_modules/ts-node-dev/bin/ts-node-dev src/index.ts"
+    "watch": "concurrently \"./node_modules/ts-node-dev/bin/ts-node-dev src/index.ts\" \"webpack --config=webpack.config.js --watch\""
   },
   "repository": {
     "type": "git",
@@ -69,7 +70,8 @@
     "sequelize": "^6.3.5",
     "typescript": "^3.9.7",
     "utility-types": "^3.10.0",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "victory": "^35.4.8"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
@@ -86,6 +88,7 @@
     "@typescript-eslint/parser": "^4.5.0",
     "babel-loader": "^8.0.6",
     "chai": "^4.2.0",
+    "concurrently": "^5.3.0",
     "cucumber": "^6.0.5",
     "cucumber-html-reporter": "^5.1.0",
     "cypress-cucumber-preprocessor": "^2.3.1",
@@ -101,15 +104,19 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-standard": "^4.0.2",
+    "html-webpack-plugin": "^5.0.0-beta.6",
     "husky": "^4.3.0",
     "jest": "^25.5.4",
     "lint-staged": "^10.4.2",
+    "mocha": "^8.1.3",
     "prettier": "2.1.2",
     "sequelize-cli": "^6.2.0",
     "start-server-and-test": "^1.11.0",
     "ts-jest": "^25.5.1",
-    "ts-loader": "^6.2.1",
-    "ts-node-dev": "^1.0.0-pre.44"
+    "ts-loader": "^6.2.2",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "webpack": "^5.19.0",
+    "webpack-cli": "^4.4.0"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true

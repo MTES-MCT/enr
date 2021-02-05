@@ -81,7 +81,6 @@ export const getStats: GetStats = () => {
   const _getDcrDeposees = async () =>
     await EventModel.count({
       where: { type: 'ProjectDCRSubmitted' },
-      logging: true,
       distinct: true,
       col: 'aggregateId',
     })

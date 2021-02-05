@@ -1,10 +1,9 @@
 import React from 'react'
+import { hydrate } from 'react-dom'
 import { StatsDTO } from '../../modules/stats/StatsDTO'
-import { Request } from 'express'
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryCursorContainer } from 'victory'
 
-interface Props extends StatsDTO {
-  request: Request
-}
+interface Props extends StatsDTO {}
 
 const ratio = (a: number, b: number) => (a && b ? `${Math.round((a / b) * 100)}%` : '0%')
 
@@ -57,6 +56,31 @@ export default function StatistiquesPages(props: Props) {
     <main role="main">
       <section className="section section-color">
         <div className="container">
+          <div style={{ height: 300, width: 600 }}>
+            <VictoryChart
+              containerComponent={
+                <VictoryCursorContainer
+                  cursorLabel={(coords) => `${Math.round(coords.x)}, ${Math.round(coords.y)}`}
+                />
+              }
+              theme={VictoryTheme.material}
+            >
+              <VictoryLine
+                style={{
+                  data: { stroke: '#c43a31' },
+                  parent: { border: '1px solid #ccc' },
+                }}
+                data={[
+                  { x: 1, y: 2 },
+                  { x: 2, y: 3 },
+                  { x: 3, y: 5 },
+                  { x: 4, y: 4 },
+                  { x: 5, y: 7 },
+                ]}
+              />
+            </VictoryChart>
+          </div>
+
           <h2 className="section__title">Potentiel en chiffres</h2>
           <p className="section__subtitle">Au service des porteurs de projets</p>
 
@@ -121,14 +145,20 @@ export default function StatistiquesPages(props: Props) {
           <h2>Demandes</h2>
 
           <div className="row">
-            {Object.entries(props.demandes)
-              .filter(([key, value]) => value)
-              .map(([key, value]) => (
-                <Card value={value} title={DEMANDE_TITLE[key]} key={'demande_' + key} />
-              ))}
+            {props.demandes &&
+              Object.entries(props.demandes)
+                .filter(([key, value]) => value)
+                .map(([key, value]) => (
+                  <Card value={value} title={DEMANDE_TITLE[key]} key={'demande_' + key} />
+                ))}
           </div>
         </div>
       </section>
     </main>
   )
+}
+
+if (typeof window !== 'undefined') {
+  const props = (window as any).__INITIAL_PROPS__
+  hydrate(<StatistiquesPages {...props} />, document.querySelector('#root'))
 }

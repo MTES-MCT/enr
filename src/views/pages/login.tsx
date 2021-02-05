@@ -1,7 +1,6 @@
-import React from 'react'
-
-import { dataId } from '../../helpers/testId'
 import { Request } from 'express'
+import React from 'react'
+import { dataId } from '../../helpers/testId'
 import routes from '../../routes'
 
 interface Props {
@@ -10,7 +9,8 @@ interface Props {
 
 /* Pure component */
 export default function LoginPage({ request }: Props) {
-  const { error, success, email } = request.query || {}
+  const { error, success, email } = request?.query || {}
+
   return (
     <main role="main">
       <section className="section section-grey">
@@ -49,9 +49,9 @@ export default function LoginPage({ request }: Props) {
                 id="submit"
                 {...dataId('submit-button')}
               >
-                Je m'identifie
+                Je m‘identifie
               </button>
-              <a href={routes.FORGOTTEN_PASSWORD}>J'ai oublié mon mot de passe</a>
+              <a href={routes.FORGOTTEN_PASSWORD}>J‘ai oublié mon mot de passe</a>
             </div>
           </form>
         </div>

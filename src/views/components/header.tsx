@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header = ({ request }: HeaderProps) => {
-  const user = request.user
+  const user = request?.user
   return (
     <header className="navbar" role="navigation">
       <div className="navbar__container">

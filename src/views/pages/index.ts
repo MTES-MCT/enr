@@ -1,29 +1,25 @@
+import { Request } from 'express'
 import fs from 'fs'
 import path from 'path'
-
 import ReactDOMServer from 'react-dom/server'
-
-import Header from '../components/header'
 import Footer from '../components/footer'
-
-import Login from './login'
-import ListProjects from './listProjects'
+import Header from '../components/header'
 import AdminNotifyCandidates from './adminNotifyCandidates'
-import ImportCandidates from './importCandidates'
-import Signup from './signup'
-import NewModificationRequest from './newModificationRequest'
-import ModificationRequestDetails from './modificationRequestDetails'
-import ForgottenPassword from './forgottenPassword'
-import ResetPassword from './resetPassword'
-import ProjectDetails from './projectDetails'
-import DrealList from './drealList'
-import InvitationList from './invitationList'
-import NotificationList from './notificationList'
-import ModificationRequestList from './modificationRequestList'
-import Statistiques from './statistiques'
 import AdminRegenerateCertificates from './adminRegenerateCertificates'
+import DrealList from './drealList'
+import ForgottenPassword from './forgottenPassword'
+import ImportCandidates from './importCandidates'
+import InvitationList from './invitationList'
+import ListProjects from './listProjects'
+import Login from './login'
+import ModificationRequestDetails from './modificationRequestDetails'
+import ModificationRequestList from './modificationRequestList'
+import NewModificationRequest from './newModificationRequest'
+import NotificationList from './notificationList'
+import ProjectDetails from './projectDetails'
+import ResetPassword from './resetPassword'
+import Signup from './signup'
 import Success from './success'
-import { Request } from 'express'
 
 const LoginPage = makePresenterPage(Login)
 const AdminNotifyCandidatesPage = makePresenterPage(AdminNotifyCandidates)
@@ -38,7 +34,6 @@ const ProjectDetailsPage = makePresenterPage(ProjectDetails)
 const DrealListPage = makePresenterPage(DrealList)
 const InvitationListPage = makePresenterPage(InvitationList)
 const NotificationListPage = makePresenterPage(NotificationList)
-const StatistiquesPage = makePresenterPage(Statistiques)
 const ModificationRequestDetailsPage = makePresenterPage(ModificationRequestDetails)
 const ModificationRequestListPage = makePresenterPage(ModificationRequestList)
 const SuccessPage = makePresenterPage(Success)
@@ -57,7 +52,6 @@ export {
   DrealListPage,
   InvitationListPage,
   NotificationListPage,
-  StatistiquesPage,
   ModificationRequestDetailsPage,
   ModificationRequestListPage,
   SuccessPage,

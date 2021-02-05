@@ -1,7 +1,7 @@
 import { getStats } from '../config'
 import { logger } from '../core/utils'
 import routes from '../routes'
-import { StatistiquesPage } from '../views/pages'
+import { StatistiquesPage } from '../views'
 import { v1Router } from './v1Router'
 import asyncHandler from 'express-async-handler'
 
@@ -10,12 +10,7 @@ v1Router.get(
   asyncHandler(async (request, response) => {
     await getStats().match(
       (stats) => {
-        response.send(
-          StatistiquesPage({
-            request,
-            ...stats,
-          })
-        )
+        response.send(StatistiquesPage(stats))
       },
       (e) => {
         logger.error(e)

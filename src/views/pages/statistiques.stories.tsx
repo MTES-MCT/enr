@@ -23,7 +23,8 @@ const props = {
     puissance: 2,
     abandon: 1,
     recours: 7,
-    delai: 0
-  }}
+    delai: 0,
+  },
+}
 
-export const empty = () => <Statistiques {...props} request={makeFakeRequest()}/>
+export const empty = () => <Statistiques {...props} />
