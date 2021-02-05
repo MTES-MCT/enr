@@ -113,6 +113,9 @@ dist
 # Uploaded files
 uploads/
 
+# Generated frontend scripts
+src/public/js/*.js
+
 # temp files
 temp/
 userData/
