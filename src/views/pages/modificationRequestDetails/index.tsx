@@ -14,6 +14,7 @@ import {
   DemandeStatus,
   ProjectDetails,
   RecoursForm,
+  AbandonForm,
 } from './components'
 
 moment.locale('fr')
@@ -34,7 +35,7 @@ export default function AdminModificationRequestPage({ request, modificationRequ
     logger.error('Try to render ProjectDetails without a user')
     return <div />
   }
-  const isResponsePossible = ['recours', 'delai'].includes(type)
+  const isResponsePossible = ['recours', 'delai', 'abandon'].includes(type)
 
   const isAdmin = user.role !== 'porteur-projet'
 
@@ -67,6 +68,10 @@ export default function AdminModificationRequestPage({ request, modificationRequ
 
                   {modificationRequest.type === 'recours' && (
                     <RecoursForm modificationRequest={modificationRequest} />
+                  )}
+
+                  {modificationRequest.type === 'abandon' && (
+                    <AbandonForm modificationRequest={modificationRequest} />
                   )}
                 </>
               )}

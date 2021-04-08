@@ -1,6 +1,8 @@
+import { ModificationRequestStatusDTO } from './ModificationRequestListItemDTO'
+
 export type ModificationRequestPageDTO = {
   id: string
-  status: string
+  status: ModificationRequestStatusDTO
 
   respondedBy?: string
   respondedOn?: Date

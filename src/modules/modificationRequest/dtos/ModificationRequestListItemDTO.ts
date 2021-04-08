@@ -13,6 +13,7 @@ export type ModificationRequestStatusDTO =
   | 'rejetée'
   | 'annulée'
   | 'en instruction'
+  | 'en attente de confirmation'
 
 export type ModificationRequestListItemDTO = {
   id: string

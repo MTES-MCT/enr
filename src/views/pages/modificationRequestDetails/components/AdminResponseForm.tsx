@@ -10,7 +10,7 @@ interface AdminResponseFormProps {
 }
 export const AdminResponseForm = ({ modificationRequest, children }: AdminResponseFormProps) => {
   const { type, versionDate } = modificationRequest
-  const isResponsePossible = ['recours', 'delai'].includes(type)
+  const isResponsePossible = ['recours', 'delai', 'abandon'].includes(type)
 
   return (
     <form

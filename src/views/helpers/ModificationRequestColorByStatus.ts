@@ -6,6 +6,7 @@ export const ModificationRequestColorByStatus: Record<
 > = {
   envoyée: '',
   'en instruction': 'warning',
+  'en attente de confirmation': 'warning',
   acceptée: 'success',
   rejetée: 'error',
   annulée: '',
