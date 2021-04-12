@@ -5,6 +5,7 @@ import {
   acceptModificationRequest,
   rejectModificationRequest,
   updateModificationRequestStatus,
+  requestConfirmation,
 } from '../../config'
 import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
@@ -30,6 +31,7 @@ v1Router.post(
       type,
       versionDate,
       submitAccept,
+      submitConfirm,
       statusUpdateOnly,
       newNotificationDate,
       delayInMonths,
@@ -38,6 +40,7 @@ v1Router.post(
     // There are two submit buttons on the form, named submitAccept and submitReject
     // We know which one has been clicked when it has a string value
     const acceptedReply = typeof submitAccept === 'string'
+    const confirmReply = typeof submitConfirm === 'string'
 
     if (statusUpdateOnly) {
       const newStatus = acceptedReply ? 'acceptée' : 'rejetée'
@@ -103,6 +106,21 @@ v1Router.post(
           delayInMonths: delayInMonths && Number(delayInMonths),
         })!,
         submittedBy: request.user,
+      }).match(
+        _handleSuccess(response, modificationRequestId),
+        _handleErrors(response, modificationRequestId)
+      )
+    }
+
+    if (confirmReply) {
+      return await requestConfirmation({
+        modificationRequestId,
+        versionDate: new Date(Number(versionDate)),
+        responseFile: {
+          contents: fs.createReadStream(request.file.path),
+          filename: request.file.originalname,
+        },
+        confirmationRequestedBy: request.user,
       }).match(
         _handleSuccess(response, modificationRequestId),
         _handleErrors(response, modificationRequestId)

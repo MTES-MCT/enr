@@ -10,20 +10,20 @@ import {
 } from '../../shared'
 import { ModificationRequest } from '../ModificationRequest'
 
-interface RequestConfirmationForAbandonDeps {
+interface RequestConfirmationDeps {
   modificationRequestRepo: Repository<ModificationRequest>
   fileRepo: Repository<FileObject>
 }
 
-interface RequestConfirmationForAbandonArgs {
+interface RequestConfirmationArgs {
   modificationRequestId: UniqueEntityID
   versionDate: Date
   responseFile: { contents: FileContents; filename: string }
   confirmationRequestedBy: User
 }
 
-export const makeRequestConfirmationForAbandon = (deps: RequestConfirmationForAbandonDeps) => (
-  args: RequestConfirmationForAbandonArgs
+export const makeRequestConfirmation = (deps: RequestConfirmationDeps) => (
+  args: RequestConfirmationArgs
 ): ResultAsync<
   null,
   | AggregateHasBeenUpdatedSinceError
