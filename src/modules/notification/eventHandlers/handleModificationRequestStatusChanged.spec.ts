@@ -5,6 +5,7 @@ import { makeUser } from '../../../entities'
 import { UnwrapForTest } from '../../../types'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import {
+  ConfirmationRequested,
   GetModificationRequestInfoForStatusNotification,
   ModificationRequestAccepted,
   ModificationRequestInstructionStarted,
@@ -132,6 +133,31 @@ describe('notification.handleModificationRequestStatusChanged', () => {
             notification.type === 'modification-request-status-update' &&
             notification.variables.status === 'en instruction' &&
             notification.variables.document_absent === ''
+        )
+      ).toBe(true)
+    })
+  })
+
+  describe('when triggered with ConfirmationRequested', () => {
+    it('should set the status in the email to en attente de confirmation and mention a document', async () => {
+      sendNotification.mockClear()
+
+      await handleModificationRequestStatusChanged({
+        sendNotification,
+        getModificationRequestInfoForStatusNotification,
+      })(
+        new ConfirmationRequested({
+          payload: { modificationRequestId, confirmationRequestedBy: '', responseFileId: '' },
+        })
+      )
+
+      const notifications = sendNotification.mock.calls.map((call) => call[0])
+      expect(
+        notifications.every(
+          (notification) =>
+            notification.type === 'modification-request-status-update' &&
+            notification.variables.status === 'en attente de confirmation' &&
+            notification.variables.document_absent === undefined
         )
       ).toBe(true)
     })

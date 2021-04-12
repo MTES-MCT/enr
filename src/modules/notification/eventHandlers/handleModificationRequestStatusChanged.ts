@@ -2,6 +2,7 @@ import { NotificationService } from '..'
 import { logger } from '../../../core/utils'
 import routes from '../../../routes'
 import {
+  ConfirmationRequested,
   ModificationRequestAccepted,
   ModificationRequestInstructionStarted,
   ModificationRequestRejected,
@@ -16,6 +17,7 @@ export const handleModificationRequestStatusChanged = (deps: {
     | ModificationRequestAccepted
     | ModificationRequestInstructionStarted
     | ModificationRequestRejected
+    | ConfirmationRequested
 ) => {
   const modificationRequestId = event.payload.modificationRequestId
   let status: string = 'mise à jour' // default
@@ -31,6 +33,10 @@ export const handleModificationRequestStatusChanged = (deps: {
       break
     case ModificationRequestRejected.type:
       status = 'rejetée'
+      hasDocument = true
+      break
+    case ConfirmationRequested.type:
+      status = 'en attente de confirmation'
       hasDocument = true
       break
   }
