@@ -15,6 +15,7 @@ export const ModificationRequestColorByStatus: Record<
 export const ModificationRequestTitleColorByStatus: Record<ModificationRequestStatusDTO, string> = {
   envoyée: '#006be6',
   'en instruction': '#ff9947',
+  'en attente de confirmation': '#ff9947',
   acceptée: 'rgb(56, 118, 29)',
   rejetée: 'rgb(204, 0, 0)',
   annulée: '',

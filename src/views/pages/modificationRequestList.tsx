@@ -186,6 +186,7 @@ export default function ModificationRequestList({
                     <option value="">Tous</option>
                     <option value="envoyée">Envoyée</option>
                     <option value="en instruction">En instruction</option>
+                    <option value="en attente de confirmation">En attente de confirmation</option>
                     <option value="acceptée">Acceptée</option>
                     <option value="rejetée">Rejetée</option>
                     <option value="annulée">Annulée</option>
