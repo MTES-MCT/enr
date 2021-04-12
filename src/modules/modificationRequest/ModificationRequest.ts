@@ -3,13 +3,19 @@ import { err, ok, Result } from '../../core/utils'
 import { User } from '../../entities'
 import { EventStoreAggregate } from '../eventStore'
 import { EntityNotFoundError, IllegalInitialStateForAggregateError } from '../shared'
-import { StatusPreventsAcceptingError, StatusPreventsRejectingError } from './errors'
+import {
+  StatusPreventsAcceptingError,
+  StatusPreventsConfirmationError,
+  StatusPreventsRejectingError,
+  TypePreventsConfirmationError,
+} from './errors'
 import {
   ModificationRequested,
   ModificationRequestAccepted,
   ModificationRequestRejected,
   ResponseTemplateDownloaded,
   ModificationRequestStatusUpdated,
+  ConfirmationRequested,
 } from './events'
 
 export interface ModificationRequest extends EventStoreAggregate {
@@ -19,21 +25,40 @@ export interface ModificationRequest extends EventStoreAggregate {
     params?: ModificationRequestAcceptanceParams
   }): Result<null, StatusPreventsAcceptingError>
   reject(rejectedBy: User, responseFileId: string): Result<null, StatusPreventsRejectingError>
+  requestConfirmation(
+    confirmationRequestedBy: User,
+    responseFileId: string
+  ): Result<null, StatusPreventsConfirmationError | TypePreventsConfirmationError>
   updateStatus(args: { updatedBy: User; newStatus: ModificationRequestStatus })
   readonly projectId: UniqueEntityID
   readonly status: ModificationRequestStatus
 }
 
-export type ModificationRequestStatus = 'envoyée' | 'acceptée' | 'rejetée' | 'annulée'
+export type ModificationRequestStatus =
+  | 'envoyée'
+  | 'acceptée'
+  | 'rejetée'
+  | 'annulée'
+  | 'en attente de confirmation'
 export type ModificationRequestAcceptanceParams =
   | { type: 'recours'; newNotificationDate: Date }
   | { type: 'delai'; delayInMonths: number }
+
+export type ModifictionRequestType =
+  | 'actionnaire'
+  | 'fournisseur'
+  | 'producteur'
+  | 'puissance'
+  | 'recours'
+  | 'abandon'
+  | 'delai'
 
 interface ModificationRequestProps {
   lastUpdatedOn: Date
   projectId: UniqueEntityID
   hasError: boolean
   status: ModificationRequestStatus
+  type: ModifictionRequestType
 }
 
 export const makeModificationRequest = (args: {
@@ -46,8 +71,9 @@ export const makeModificationRequest = (args: {
     return err(new EntityNotFoundError())
   }
 
-  const initialProjectId = _getInitialProjectId()
-  if (!initialProjectId) {
+  const foundingEvent = _getFoundingEvent()
+
+  if (!foundingEvent) {
     return err(new IllegalInitialStateForAggregateError())
   }
 
@@ -55,8 +81,9 @@ export const makeModificationRequest = (args: {
   const props: ModificationRequestProps = {
     lastUpdatedOn: history[0].occurredAt,
     hasError: false,
-    projectId: initialProjectId,
+    projectId: new UniqueEntityID(foundingEvent.payload.projectId),
     status: 'envoyée',
+    type: foundingEvent.payload.type as ModifictionRequestType,
   }
 
   for (const event of history) {
@@ -104,6 +131,27 @@ export const makeModificationRequest = (args: {
 
       return ok(null)
     },
+    requestConfirmation: function (confirmationRequestedBy, responseFileId) {
+      if (props.status !== 'envoyée') {
+        return err(new StatusPreventsConfirmationError(props.status))
+      }
+
+      if (props.type !== 'abandon') {
+        return err(new TypePreventsConfirmationError(props.type))
+      }
+
+      _publishEvent(
+        new ConfirmationRequested({
+          payload: {
+            modificationRequestId: modificationRequestId.toString(),
+            confirmationRequestedBy: confirmationRequestedBy.id,
+            responseFileId,
+          },
+        })
+      )
+
+      return ok(null)
+    },
     updateStatus: function ({ updatedBy, newStatus }) {
       _publishEvent(
         new ModificationRequestStatusUpdated({
@@ -143,6 +191,7 @@ export const makeModificationRequest = (args: {
     switch (event.type) {
       case ModificationRequested.type:
         props.status = 'envoyée'
+        props.type = event.payload.type
         break
       case ModificationRequestAccepted.type:
         props.status = 'acceptée'
@@ -152,6 +201,9 @@ export const makeModificationRequest = (args: {
         break
       case ModificationRequestStatusUpdated.type:
         props.status = event.payload.newStatus
+        break
+      case ConfirmationRequested.type:
+        props.status = 'en attente de confirmation'
         break
       default:
         // ignore other event types
@@ -171,8 +223,7 @@ export const makeModificationRequest = (args: {
     return event.type === ModificationRequested.type
   }
 
-  function _getInitialProjectId(): UniqueEntityID | null {
-    const foundingEvent = history.find(_isModificationRequestedEvent)
-    return foundingEvent ? new UniqueEntityID(foundingEvent.payload.projectId) : null
+  function _getFoundingEvent(): ModificationRequested | undefined {
+    return history.find(_isModificationRequestedEvent)
   }
 }
