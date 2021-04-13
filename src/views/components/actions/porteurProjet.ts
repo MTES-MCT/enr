@@ -3,6 +3,7 @@ import ROUTES from '../../../routes'
 const porteurProjetActions = (project: {
   id: string
   isClasse: boolean
+  isAbandoned: boolean
   certificateFile?: {
     id: string
     filename: string
@@ -16,6 +17,8 @@ const porteurProjetActions = (project: {
   nomProjet: string
 }) => {
   const canDownloadCertificate = !!project.certificateFile
+
+  if (project.isAbandoned) return []
 
   if (!project.isClasse) {
     return [

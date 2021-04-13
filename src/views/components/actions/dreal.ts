@@ -3,9 +3,12 @@ import ROUTES from '../../../routes'
 const drealActions = (project: {
   id: string
   gf: { id: string; status: 'à traiter' | 'validé' }
+  isAbandoned: boolean
 }) => {
   const actions: any = []
   const { gf } = project
+
+  if (project.isAbandoned) return []
 
   if (!gf) return actions
 

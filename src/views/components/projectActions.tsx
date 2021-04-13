@@ -7,6 +7,7 @@ interface Props {
   project: {
     id: string
     isClasse: boolean
+    isAbandoned: boolean
     notifiedOn?: Date
     certificateFile?: {
       id: string

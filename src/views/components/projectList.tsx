@@ -324,6 +324,7 @@ const ProjectList = ({ projects, displayColumns, role }: Props) => {
                       project={{
                         ...project,
                         isClasse: project.classe === 'Classé',
+                        isAbandoned: project.abandonedOn !== 0,
                         notifiedOn: project.notifiedOn ? new Date(project.notifiedOn) : undefined,
                       }}
                     />
