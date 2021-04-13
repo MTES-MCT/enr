@@ -65,6 +65,7 @@ const baseProjectSchema = SchemaRecord({
   dcrFileId: String,
   dcrDate: Number,
   completionDueOn: Number,
+  abandonedOn: Number,
   numeroGestionnaire: String,
 })
 const projectSchema = baseProjectSchema.And(
@@ -290,6 +291,7 @@ export default ({ makeId }: MakeProjectDependencies) =>
     dcrNumeroDossier: '',
     dcrDate: 0,
     completionDueOn: 0,
+    abandonedOn: 0,
     numeroGestionnaire: '',
   })
 

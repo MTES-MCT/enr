@@ -133,6 +133,11 @@ export const MakeProjectModel = (sequelize) => {
         allowNull: false,
         defaultValue: 0,
       },
+      abandonedOn: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
       details: {
         type: DataTypes.JSON,
         allowNull: true,
