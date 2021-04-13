@@ -7,6 +7,7 @@ import { ModificationRequestVariants } from './dtos'
 import {
   StatusPreventsAcceptingError,
   StatusPreventsConfirmationError,
+  StatusPreventsConfirmationRequestError,
   StatusPreventsRejectingError,
   TypePreventsConfirmationError,
 } from './errors'
@@ -17,6 +18,7 @@ import {
   ResponseTemplateDownloaded,
   ModificationRequestStatusUpdated,
   ConfirmationRequested,
+  ModificationRequestConfirmed,
 } from './events'
 
 export interface ModificationRequest extends EventStoreAggregate {
@@ -29,7 +31,8 @@ export interface ModificationRequest extends EventStoreAggregate {
   requestConfirmation(
     confirmationRequestedBy: User,
     responseFileId: string
-  ): Result<null, StatusPreventsConfirmationError | TypePreventsConfirmationError>
+  ): Result<null, StatusPreventsConfirmationRequestError | TypePreventsConfirmationError>
+  confirm(confirmedBy: User): Result<null, StatusPreventsConfirmationError>
   updateStatus(args: { updatedBy: User; newStatus: ModificationRequestStatus })
   readonly projectId: UniqueEntityID
   readonly status: ModificationRequestStatus
@@ -42,6 +45,7 @@ export type ModificationRequestStatus =
   | 'rejetée'
   | 'annulée'
   | 'en attente de confirmation'
+  | 'demande confirmée'
 export type ModificationRequestAcceptanceParams =
   | { type: 'recours'; newNotificationDate: Date }
   | { type: 'delai'; delayInMonths: number }
@@ -135,7 +139,7 @@ export const makeModificationRequest = (args: {
     },
     requestConfirmation: function (confirmationRequestedBy, responseFileId) {
       if (props.status !== 'envoyée') {
-        return err(new StatusPreventsConfirmationError(props.status))
+        return err(new StatusPreventsConfirmationRequestError(props.status))
       }
 
       if (props.type !== 'abandon') {
@@ -148,6 +152,22 @@ export const makeModificationRequest = (args: {
             modificationRequestId: modificationRequestId.toString(),
             confirmationRequestedBy: confirmationRequestedBy.id,
             responseFileId,
+          },
+        })
+      )
+
+      return ok(null)
+    },
+    confirm: function (confirmedBy) {
+      if (props.status !== 'en attente de confirmation') {
+        return err(new StatusPreventsConfirmationError(props.status))
+      }
+
+      _publishEvent(
+        new ModificationRequestConfirmed({
+          payload: {
+            modificationRequestId: modificationRequestId.toString(),
+            confirmedBy: confirmedBy.id,
           },
         })
       )

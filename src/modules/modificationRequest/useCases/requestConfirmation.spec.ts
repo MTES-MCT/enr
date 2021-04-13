@@ -8,7 +8,7 @@ import makeFakeUser from '../../../__tests__/fixtures/user'
 import { FileObject } from '../../file'
 import { AggregateHasBeenUpdatedSinceError, UnauthorizedError } from '../../shared'
 import { ModificationRequest } from '../ModificationRequest'
-import { makeRequestConfirmationForAbandon } from './requestConfirmation'
+import { makeRequestConfirmation } from './requestConfirmation'
 
 describe('requestConfirmation use-case', () => {
   const fakeModificationRequest = {
@@ -24,7 +24,7 @@ describe('requestConfirmation use-case', () => {
   const fakeFileName = 'myfilename.pdf'
   const fakeUser = UnwrapForTest(makeUser(makeFakeUser({ role: 'admin' })))
 
-  const requestConfirmation = makeRequestConfirmationForAbandon({
+  const requestConfirmation = makeRequestConfirmation({
     modificationRequestRepo,
     fileRepo: fileRepo as Repository<FileObject>,
   })

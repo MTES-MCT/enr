@@ -1,19 +1,24 @@
 import { UniqueEntityID } from '../../core/domain'
 import { makeUser } from '../../entities'
 import makeFakeUser from '../../__tests__/fixtures/user'
-import { ModificationRequestAccepted, ModificationRequested, ConfirmationRequested } from './events'
-import { StatusPreventsConfirmationRequestError, TypePreventsConfirmationError } from './errors'
+import {
+  ModificationRequestAccepted,
+  ModificationRequested,
+  ConfirmationRequested,
+  ModificationRequestConfirmed,
+} from './events'
+import { StatusPreventsConfirmationError, TypePreventsConfirmationError } from './errors'
 import { makeModificationRequest } from './ModificationRequest'
 import { UnwrapForTest as OldUnwrapForTest } from '../../types'
 import { UnwrapForTest } from '../../core/utils'
 
-describe('Modification.requestConfirmation()', () => {
+describe('Modification.confirm()', () => {
   const modificationRequestId = new UniqueEntityID()
   const projectId = new UniqueEntityID()
   const fakeUser = OldUnwrapForTest(makeUser(makeFakeUser()))
   const fakeResponseFileId = new UniqueEntityID().toString()
 
-  describe('when demande of type abandon and status is envoyée', () => {
+  describe('when demande of type abandon and status is en attente de confirmation', () => {
     const fakeModificationRequest = UnwrapForTest(
       makeModificationRequest({
         modificationRequestId,
@@ -26,33 +31,39 @@ describe('Modification.requestConfirmation()', () => {
               requestedBy: fakeUser.id,
             },
           }),
+          new ConfirmationRequested({
+            payload: {
+              modificationRequestId: modificationRequestId.toString(),
+              confirmationRequestedBy: fakeUser.id,
+              responseFileId: '',
+            },
+          }),
         ],
       })
     )
 
     beforeAll(() => {
-      expect(fakeModificationRequest.status).toEqual('envoyée')
+      expect(fakeModificationRequest.status).toEqual('en attente de confirmation')
 
-      const res = fakeModificationRequest.requestConfirmation(fakeUser, fakeResponseFileId)
+      const res = fakeModificationRequest.confirm(fakeUser)
       expect(res.isOk()).toBe(true)
     })
 
-    it('should emit ConfirmationRequested', () => {
+    it('should emit ModificationRequestConfirmed', () => {
       expect(fakeModificationRequest.pendingEvents).not.toHaveLength(0)
 
       const targetEvent = fakeModificationRequest.pendingEvents.find(
-        (item) => item.type === ConfirmationRequested.type
-      ) as ConfirmationRequested | undefined
+        (item) => item.type === ModificationRequestConfirmed.type
+      ) as ModificationRequestConfirmed | undefined
       expect(targetEvent).toBeDefined()
       if (!targetEvent) return
 
       expect(targetEvent.payload.modificationRequestId).toEqual(modificationRequestId.toString())
-      expect(targetEvent.payload.confirmationRequestedBy).toEqual(fakeUser.id)
-      expect(targetEvent.payload.responseFileId).toEqual(fakeResponseFileId)
+      expect(targetEvent.payload.confirmedBy).toEqual(fakeUser.id)
     })
   })
 
-  describe('when demande status is not envoyée', () => {
+  describe('when demande status is not en attente de confirmation', () => {
     const fakeModificationRequest = UnwrapForTest(
       makeModificationRequest({
         modificationRequestId,
@@ -76,40 +87,14 @@ describe('Modification.requestConfirmation()', () => {
       })
     )
 
-    it('should return StatusPreventsConfirmationRequestError', () => {
+    it('should return StatusPreventsConfirmationError', () => {
       expect(fakeModificationRequest.status).toEqual('acceptée')
 
-      const res = fakeModificationRequest.requestConfirmation(fakeUser, fakeResponseFileId)
+      const res = fakeModificationRequest.confirm(fakeUser)
       expect(res.isErr()).toBe(true)
       if (res.isOk()) return
 
-      expect(res.error).toBeInstanceOf(StatusPreventsConfirmationRequestError)
-    })
-  })
-
-  describe('when demande is not of type abandon', () => {
-    const fakeModificationRequest = UnwrapForTest(
-      makeModificationRequest({
-        modificationRequestId,
-        history: [
-          new ModificationRequested({
-            payload: {
-              modificationRequestId: modificationRequestId.toString(),
-              projectId: projectId.toString(),
-              type: 'recours',
-              requestedBy: fakeUser.id,
-            },
-          }),
-        ],
-      })
-    )
-
-    it('should return TypePreventsConfirmationError', () => {
-      const res = fakeModificationRequest.requestConfirmation(fakeUser, fakeResponseFileId)
-      expect(res.isErr()).toBe(true)
-      if (res.isOk()) return
-
-      expect(res.error).toBeInstanceOf(TypePreventsConfirmationError)
+      expect(res.error).toBeInstanceOf(StatusPreventsConfirmationError)
     })
   })
 })
