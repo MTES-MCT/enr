@@ -455,6 +455,10 @@ export default function makeProjectRepo({ sequelizeInstance, appelOffreRepo }): 
         opts.where.notifiedOn = query.isNotified ? { [Op.ne]: 0 } : 0
       }
 
+      if ('isAbandoned' in query) {
+        opts.where.abandonedOn = query.isAbandoned ? { [Op.ne]: 0 } : 0
+      }
+
       if ('garantiesFinancieres' in query) {
         switch (query.garantiesFinancieres) {
           case 'submitted':

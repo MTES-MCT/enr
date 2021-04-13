@@ -5,6 +5,7 @@ export interface ProjectFilters {
   isNotified?: boolean
   garantiesFinancieres?: 'submitted' | 'notSubmitted' | 'pastDue'
   isClasse?: boolean
+  isAbandoned?: boolean
   nomProjet?: string
   appelOffreId?: AppelOffre['id'] | AppelOffre['id'][]
   periodeId?: Periode['id'] | Periode['id'][]

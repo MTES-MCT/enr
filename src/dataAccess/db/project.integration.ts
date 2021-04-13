@@ -98,6 +98,7 @@ describe('projectRepo sequelize', () => {
 
         const goodProperties = {
           notifiedOn: 1,
+          abandonedOn: 0,
           classe: 'Classé',
           appelOffreId: 'Fessenheim',
           periodeId: '2',
@@ -147,6 +148,11 @@ describe('projectRepo sequelize', () => {
               ...goodProperties,
               nomProjet: 'other',
             },
+            {
+              id: uuid(),
+              ...goodProperties,
+              abandonedOn: 1,
+            },
           ]
             .map(makeFakeProject)
             .map(projectRepo.save)
@@ -155,6 +161,7 @@ describe('projectRepo sequelize', () => {
         const { itemCount, items } = await projectRepo.findAll({
           isNotified: true,
           isClasse: true,
+          isAbandoned: false,
           appelOffreId: 'Fessenheim',
           periodeId: '2',
           familleId: '1',
