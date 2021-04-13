@@ -26,6 +26,7 @@ import {
 } from '../shared'
 import { ProjectDataForCertificate } from './dtos'
 import {
+  EliminatedProjectCannotBeAbandonnedError,
   IllegalProjectDataError,
   ProjectAlreadyNotifiedError,
   ProjectCannotBeUpdatedIfUnnotifiedError,
@@ -33,6 +34,7 @@ import {
 } from './errors'
 import {
   LegacyProjectSourced,
+  ProjectAbandonned,
   ProjectCertificateGenerated,
   ProjectCertificateRegenerated,
   ProjectCertificateUpdated,
@@ -53,6 +55,7 @@ export interface Project extends EventStoreAggregate {
   notify: (
     notifiedOn: number
   ) => Result<null, IllegalProjectDataError | ProjectAlreadyNotifiedError>
+  abandon: (user: User) => Result<null, EliminatedProjectCannotBeAbandonnedError>
   correctData: (
     user: User,
     data: ProjectDataCorrectedPayload['correctedData']
@@ -211,6 +214,22 @@ export const makeProject = (args: {
       _updateDCRDate()
       _updateGFDate()
       _updateCompletionDate()
+
+      return ok(null)
+    },
+    abandon: function (user) {
+      if (!props.isClasse) {
+        return err(new EliminatedProjectCannotBeAbandonnedError())
+      }
+
+      _publishEvent(
+        new ProjectAbandonned({
+          payload: {
+            projectId: projectId.toString(),
+            abandonAcceptedBy: user.id,
+          },
+        })
+      )
 
       return ok(null)
     },
