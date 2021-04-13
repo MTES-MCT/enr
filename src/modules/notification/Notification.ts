@@ -1,8 +1,7 @@
 import { Optional } from 'utility-types'
-
-import { Project, User, DREAL } from '../../entities'
-import { AggregateRoot, UniqueEntityID, DomainError, DomainEvent } from '../../core/domain'
-import { Result, ok } from '../../core/utils'
+import { AggregateRoot, DomainError, DomainEvent, UniqueEntityID } from '../../core/domain'
+import { ok, Result } from '../../core/utils'
+import { DREAL, Project, User } from '../../entities'
 
 type BaseNotification = {
   message: {
@@ -143,6 +142,19 @@ type ModificationRequestStatusUpdate = {
   }
 }
 
+type ModificationRequestConfirmedByPP = {
+  type: 'modification-request-confirmed'
+  context: {
+    modificationRequestId: string
+    userId: string
+  }
+  variables: {
+    nom_projet: string
+    type_demande: string
+    modification_request_url: string
+  }
+}
+
 type NotificationVariants =
   | Designation
   | RelanceDesignation
@@ -154,6 +166,7 @@ type NotificationVariants =
   | RelanceGarantiesFinancieres
   | PP_CertificateUpdated
   | ModificationRequestStatusUpdate
+  | ModificationRequestConfirmedByPP
 
 export type NotificationProps = BaseNotification & NotificationVariants
 

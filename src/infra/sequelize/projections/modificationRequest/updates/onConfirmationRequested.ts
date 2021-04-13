@@ -13,8 +13,10 @@ export const onConfirmationRequested = (models) => async (event: ConfirmationReq
     return
   }
 
+  const { responseFileId, confirmationRequestedBy } = event.payload
   instance.status = 'en attente de confirmation'
-  instance.responseFileId = event.payload.responseFileId
+  instance.responseFileId = responseFileId
+  instance.confirmationRequestedBy = confirmationRequestedBy
 
   try {
     await instance.save()

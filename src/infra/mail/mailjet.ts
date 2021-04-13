@@ -18,6 +18,7 @@ const TEMPLATE_ID_BY_TYPE: Record<NotificationProps['type'], number> = {
   'relance-gf': 1554449,
   'pp-certificate-updated': 1765851,
   'modification-request-status-update': 2046625,
+  'modification-request-confirmed': 2807220,
 }
 
 interface SendEmailFromMailjetDeps {

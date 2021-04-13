@@ -86,6 +86,10 @@ export const MakeModificationRequestModel = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+      confirmationRequestedBy: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -122,6 +126,11 @@ export const MakeModificationRequestModel = (sequelize) => {
     ModificationRequest.belongsTo(UserModel, {
       foreignKey: 'respondedBy',
       as: 'respondedByUser',
+      constraints: false,
+    })
+    ModificationRequest.belongsTo(UserModel, {
+      foreignKey: 'confirmationRequestedBy',
+      as: 'confirmationRequestedByUser',
       constraints: false,
     })
   }
