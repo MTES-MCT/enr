@@ -34,7 +34,7 @@ import {
 } from './errors'
 import {
   LegacyProjectSourced,
-  ProjectAbandonned,
+  ProjectAbandoned,
   ProjectCertificateGenerated,
   ProjectCertificateRegenerated,
   ProjectCertificateUpdated,
@@ -223,7 +223,7 @@ export const makeProject = (args: {
       }
 
       _publishEvent(
-        new ProjectAbandonned({
+        new ProjectAbandoned({
           payload: {
             projectId: projectId.toString(),
             abandonAcceptedBy: user.id,

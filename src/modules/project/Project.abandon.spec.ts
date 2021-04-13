@@ -6,13 +6,7 @@ import { UnwrapForTest as OldUnwrapForTest } from '../../types'
 import makeFakeProject from '../../__tests__/fixtures/project'
 import makeFakeUser from '../../__tests__/fixtures/user'
 import { EliminatedProjectCannotBeAbandonnedError } from './errors'
-import {
-  LegacyProjectSourced,
-  ProjectAbandonned,
-  ProjectCompletionDueDateSet,
-  ProjectDCRDueDateSet,
-  ProjectGFDueDateSet,
-} from './events'
+import { LegacyProjectSourced, ProjectAbandoned } from './events'
 import { makeProject } from './Project'
 
 const projectId = new UniqueEntityID('project1')
@@ -49,12 +43,12 @@ describe('Project.abandon()', () => {
       })
     )
 
-    it('should emit ProjectAbandonned event', () => {
+    it('should emit ProjectAbandoned event', () => {
       project.abandon(fakeUser)
 
       const targetEvent = project.pendingEvents.find(
-        (item) => item.type === ProjectAbandonned.type
-      ) as ProjectAbandonned | undefined
+        (item) => item.type === ProjectAbandoned.type
+      ) as ProjectAbandoned | undefined
       expect(targetEvent).toBeDefined()
       if (!targetEvent) return
 
