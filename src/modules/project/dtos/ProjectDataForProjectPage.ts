@@ -36,7 +36,7 @@ export type ProjectDataForProjectPage = {
 
   updatedAt?: Date
 } & (IsNotified | IsNotNotified) &
-  (IsClasse | IsElimine)
+  (IsClasse | IsElimine | IsAbandoned)
 
 type IsNotNotified = {
   notifiedOn: undefined
@@ -53,6 +53,7 @@ type IsNotified = {
 
 type IsClasse = {
   isClasse: true
+  isAbandoned: false
   completionDueOn: Date
 } & GarantieFinanciere &
   DCR &
@@ -60,7 +61,13 @@ type IsClasse = {
 
 type IsElimine = {
   isClasse: false
+  isAbandoned: false
   motifsElimination: string
+}
+
+type IsAbandoned = {
+  isAbandoned: true
+  isClasse: false
 }
 
 type DCR = { dcr: { dueOn: Date } & (DCRSubmitted | DCRPending) }
