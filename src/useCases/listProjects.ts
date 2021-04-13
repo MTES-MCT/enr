@@ -27,7 +27,7 @@ interface ListProjectsDeps {
   familleId?: Famille['id']
   pagination?: Pagination
   recherche?: string
-  classement?: 'classés' | 'éliminés'
+  classement?: 'classés' | 'éliminés' | 'abandons'
   garantiesFinancieres?: 'submitted' | 'notSubmitted' | 'pastDue'
 }
 
@@ -76,8 +76,18 @@ export default function makeListProjects({
       }
     }
 
-    if (classement) {
-      query.isClasse = classement === 'classés'
+    switch (classement) {
+      case 'classés':
+        query.isClasse = true
+        query.isAbandoned = false
+        break
+      case 'éliminés':
+        query.isClasse = false
+        query.isAbandoned = false
+        break
+      case 'abandons':
+        query.isAbandoned = true
+        break
     }
 
     if (garantiesFinancieres) {
