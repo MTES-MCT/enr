@@ -33,6 +33,7 @@ import {
   makeRejectModificationRequest,
   makeUpdateModificationRequestStatus,
   makeRequestConfirmation,
+  makeConfirmRequest,
 } from '../modules/modificationRequest'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
@@ -73,6 +74,11 @@ export const requestConfirmation = makeRequestConfirmation({
 })
 export const updateModificationRequestStatus = makeUpdateModificationRequestStatus({
   modificationRequestRepo,
+})
+
+export const confirmRequest = makeConfirmRequest({
+  modificationRequestRepo,
+  shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
 })
 
 export const revokeUserRightsToProject = makeRevokeRightsToProject({

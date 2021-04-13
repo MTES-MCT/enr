@@ -180,6 +180,9 @@ class routes {
   static DEMANDER_ABANDON = withProjectId('/demande-modification.html?action=abandon')
 
   static DEMANDE_ACTION = '/soumettre-demande'
+
+  static CONFIRMER_DEMANDE_ACTION = '/confirmer-demande'
+
   static DOWNLOAD_PROJECT_FILE = (fileId?: string, filename?: string) => {
     const route = '/telechargement/:fileId/fichier/:filename'
     if (fileId && filename) {
