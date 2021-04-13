@@ -163,42 +163,76 @@ const ColumnComponent: Record<Columns, ColumnRenderer> = {
     )
   } as ColumnRenderer,
   Classé: function ClasséColumn({ project }) {
+    if (project.abandonedOn) {
+      return (
+        <td
+          valign="top"
+          className={'projectList-classe-column notification warning'}
+          style={{ position: 'relative' }}
+        >
+          <div {...dataId('projectList-item-classe')}>Abandonné</div>
+        </td>
+      )
+    }
+
+    if (project.classe === 'Eliminé') {
+      return (
+        <td
+          valign="top"
+          className={'projectList-classe-column notification error'}
+          style={{ position: 'relative' }}
+        >
+          <div {...dataId('projectList-item-classe')}>
+            {project.motifsElimination ? (
+              <a
+                href="#"
+                {...dataId('projectList-item-toggleMotifsElimination')}
+                style={{
+                  textDecoration: 'none',
+                  color: 'var(--theme-dark-text)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Eliminé
+                <svg
+                  className="icon icon-mail"
+                  style={{
+                    width: 10,
+                    verticalAlign: 'bottom',
+                    marginLeft: 5,
+                  }}
+                >
+                  <use xlinkHref="#expand"></use>
+                </svg>
+              </a>
+            ) : (
+              'Eliminé'
+            )}
+          </div>
+
+          <div
+            style={{
+              fontStyle: 'italic',
+              lineHeight: 'normal',
+              fontSize: 12,
+              display: 'none',
+            }}
+            className="motif-popover"
+            {...dataId('projectList-item-motifsElimination')}
+          >
+            {project.motifsElimination || ''}
+          </div>
+        </td>
+      )
+    }
+
     return (
       <td
         valign="top"
-        className={
-          'projectList-classe-column notification ' +
-          (project.classe === 'Classé' ? 'success' : 'error')
-        }
+        className={'projectList-classe-column notification success'}
         style={{ position: 'relative' }}
       >
-        <div {...dataId('projectList-item-classe')}>
-          {project.classe === 'Classé' || !project.motifsElimination ? (
-            project.classe
-          ) : (
-            <a
-              href="#"
-              {...dataId('projectList-item-toggleMotifsElimination')}
-              style={{
-                textDecoration: 'none',
-                color: 'var(--theme-dark-text)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Eliminé
-              <svg
-                className="icon icon-mail"
-                style={{
-                  width: 10,
-                  verticalAlign: 'bottom',
-                  marginLeft: 5,
-                }}
-              >
-                <use xlinkHref="#expand"></use>
-              </svg>
-            </a>
-          )}
-        </div>
+        <div {...dataId('projectList-item-classe')}>Classé</div>
         <div
           style={{
             position: 'absolute',
@@ -208,26 +242,11 @@ const ColumnComponent: Record<Columns, ColumnRenderer> = {
             color: 'var(--green)',
           }}
         >
-          {project.classe === 'Classé'
-            ? project.isFinancementParticipatif
-              ? 'FP'
-              : project.isInvestissementParticipatif
-              ? 'IP'
-              : ''
+          {project.isFinancementParticipatif
+            ? 'FP'
+            : project.isInvestissementParticipatif
+            ? 'IP'
             : ''}
-        </div>
-
-        <div
-          style={{
-            fontStyle: 'italic',
-            lineHeight: 'normal',
-            fontSize: 12,
-            display: 'none',
-          }}
-          className="motif-popover"
-          {...dataId('projectList-item-motifsElimination')}
-        >
-          {project.motifsElimination || ''}
         </div>
       </td>
     )
