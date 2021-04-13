@@ -11,4 +11,5 @@ export const makeFakeModificationRequest = () => ({
   lastUpdatedOn: new Date(0),
   id: new UniqueEntityID(),
   status: 'envoyée',
+  type: 'delai',
 })

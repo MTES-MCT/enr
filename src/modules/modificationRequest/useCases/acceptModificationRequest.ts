@@ -23,7 +23,7 @@ interface AcceptModificationRequestDeps {
 
 interface AcceptModificationRequestArgs {
   modificationRequestId: UniqueEntityID
-  acceptanceParams: ModificationRequestAcceptanceParams
+  acceptanceParams?: ModificationRequestAcceptanceParams
   versionDate: Date
   responseFile: { contents: FileContents; filename: string }
   submittedBy: User
@@ -85,17 +85,18 @@ export const makeAcceptModificationRequest = (deps: AcceptModificationRequestDep
         ProjectCannotBeUpdatedIfUnnotifiedError | IllegalProjectDataError
       > = ok(null)
 
-      if (acceptanceParams.type === 'recours') {
+      if (modificationRequest.type === 'recours' && acceptanceParams?.type === 'recours') {
         action = project
           .grantClasse(submittedBy)
           .andThen(() => project.updateCertificate(submittedBy, responseFileId))
           .andThen(() =>
             project.setNotificationDate(submittedBy, acceptanceParams.newNotificationDate.getTime())
           )
-      } else if (acceptanceParams.type === 'delai') {
+      } else if (modificationRequest.type === 'delai' && acceptanceParams?.type === 'delai') {
         action = project.moveCompletionDueDate(submittedBy, acceptanceParams.delayInMonths)
+      } else if (modificationRequest.type === 'abandon') {
+        action = project.abandon(submittedBy)
       }
-
       return action.map(() => ({ project, modificationRequest, responseFileId }))
     })
     .andThen(({ project, modificationRequest, responseFileId }) => {

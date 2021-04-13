@@ -87,6 +87,7 @@ describe('acceptModificationRequest use-case', () => {
     describe('when type is recours', () => {
       const fakeModificationRequest = {
         ...makeFakeModificationRequest(),
+        type: 'recours',
       }
       const fakeProject = {
         ...makeFakeProject(),
@@ -145,6 +146,7 @@ describe('acceptModificationRequest use-case', () => {
     describe('when type is delai', () => {
       const fakeModificationRequest = {
         ...makeFakeModificationRequest(),
+        type: 'delai',
       }
       const fakeProject = {
         ...makeFakeProject(),
@@ -178,6 +180,50 @@ describe('acceptModificationRequest use-case', () => {
       it('should call moveCompletionDueDate on project', () => {
         expect(fakeProject.moveCompletionDueDate).toHaveBeenCalledTimes(1)
         expect(fakeProject.moveCompletionDueDate).toHaveBeenCalledWith(fakeUser, 2)
+      })
+
+      it('should save the project', () => {
+        expect(projectRepo.save).toHaveBeenCalled()
+        expect(projectRepo.save.mock.calls[0][0]).toEqual(fakeProject)
+      })
+    })
+
+    describe('when type is abandon', () => {
+      const fakeModificationRequest = {
+        ...makeFakeModificationRequest(),
+        type: 'abandon',
+      }
+      const fakeProject = {
+        ...makeFakeProject(),
+        id: fakeModificationRequest.projectId,
+      }
+      const modificationRequestRepo = fakeRepo(fakeModificationRequest as ModificationRequest)
+      const projectRepo = fakeRepo(fakeProject as Project)
+      const fileRepo = {
+        save: jest.fn((file: FileObject) => okAsync(null)),
+        load: jest.fn(),
+      }
+
+      const acceptModificationRequest = makeAcceptModificationRequest({
+        modificationRequestRepo,
+        projectRepo,
+        fileRepo: fileRepo as Repository<FileObject>,
+      })
+      beforeAll(async () => {
+        const res = await acceptModificationRequest({
+          modificationRequestId: fakeModificationRequest.id,
+          versionDate: fakeModificationRequest.lastUpdatedOn,
+          responseFile: { contents: fakeFileContents, filename: fakeFileName },
+          submittedBy: fakeUser,
+        })
+
+        if (res.isErr()) logger.error(res.error)
+        expect(res.isOk()).toEqual(true)
+      })
+
+      it('should call abandon on project', () => {
+        expect(fakeProject.abandon).toHaveBeenCalledTimes(1)
+        expect(fakeProject.abandon).toHaveBeenCalledWith(fakeUser)
       })
 
       it('should save the project', () => {

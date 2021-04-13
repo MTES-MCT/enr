@@ -3,6 +3,7 @@ import { err, ok, Result } from '../../core/utils'
 import { User } from '../../entities'
 import { EventStoreAggregate } from '../eventStore'
 import { EntityNotFoundError, IllegalInitialStateForAggregateError } from '../shared'
+import { ModificationRequestVariants } from './dtos'
 import {
   StatusPreventsAcceptingError,
   StatusPreventsConfirmationError,
@@ -32,6 +33,7 @@ export interface ModificationRequest extends EventStoreAggregate {
   updateStatus(args: { updatedBy: User; newStatus: ModificationRequestStatus })
   readonly projectId: UniqueEntityID
   readonly status: ModificationRequestStatus
+  readonly type: ModifictionRequestType
 }
 
 export type ModificationRequestStatus =
@@ -179,6 +181,9 @@ export const makeModificationRequest = (args: {
     },
     get status() {
       return props.status
+    },
+    get type() {
+      return props.type
     },
   })
 
