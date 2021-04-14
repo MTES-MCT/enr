@@ -16,6 +16,7 @@ export const onModificationRequestConfirmed = (models) => async (
   }
 
   instance.status = 'demande confirmée'
+  instance.versionDate = event.occurredAt
 
   try {
     await instance.save()

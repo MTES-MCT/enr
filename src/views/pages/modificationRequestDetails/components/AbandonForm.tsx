@@ -16,7 +16,7 @@ export const AbandonForm = ({ modificationRequest }: AbandonFormProps) => (
       <input type="file" name="file" id="file" />
     </div>
 
-    {modificationRequest.status !== 'en attente de confirmation' && (
+    {!['en attente de confirmation', 'demande confirmée'].includes(modificationRequest.status) && (
       <button className="button" type="submit" name="submitConfirm" {...dataId('submit-button')}>
         Demander une confirmation au porteur de projet
       </button>

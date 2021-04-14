@@ -7,14 +7,12 @@ import routes from '../../routes'
 import { ensureLoggedIn, ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
-const FORMAT_DATE = 'DD/MM/YYYY'
-
 v1Router.post(
-  routes.ADMIN_REPLY_TO_MODIFICATION_REQUEST,
+  routes.CONFIRMER_DEMANDE_ACTION,
   ensureLoggedIn(),
   ensureRole(['porteur-projet']),
   asyncHandler(async (request, response) => {
-    const { modificationRequestId, type, versionDate } = request.body
+    const { modificationRequestId, versionDate } = request.body
 
     return confirmRequest({
       modificationRequestId,

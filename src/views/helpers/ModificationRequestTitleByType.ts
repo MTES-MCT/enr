@@ -1,8 +1,8 @@
 export const ModificationRequestTitleByType = {
-  delai: 'délai supplémentaire',
-  actionnaire: "changement d'actionnaire",
-  puissance: 'changement de puissance',
-  producteur: 'changement de producteur',
-  abandon: 'abandon de mon projet',
-  recours: 'recours',
+  delai: 'de délai supplémentaire',
+  actionnaire: "de changement d'actionnaire",
+  puissance: 'de changement de puissance',
+  producteur: 'de changement de producteur',
+  abandon: "d'abandon",
+  recours: 'de recours',
 }

@@ -45,7 +45,7 @@ export default function AdminModificationRequestPage({ request, modificationRequ
     <Dashboard role={user.role} currentPage={'list-requests'}>
       <div className="panel">
         <div className="panel__header" style={{ position: 'relative' }}>
-          <h3>Demande de {ModificationRequestTitleByType[type]}</h3>
+          <h3>Demande {ModificationRequestTitleByType[type]}</h3>
         </div>
 
         <DemandeDetails modificationRequest={modificationRequest} />
@@ -79,7 +79,7 @@ export default function AdminModificationRequestPage({ request, modificationRequ
           </div>
         )}
 
-        <DemandeStatus modificationRequest={modificationRequest} />
+        <DemandeStatus role={user.role} modificationRequest={modificationRequest} />
       </div>
     </Dashboard>
   )

@@ -1,4 +1,5 @@
 import React from 'react'
+import { User } from '../../../../entities'
 import { formatDate } from '../../../../helpers/formatDate'
 import { dataId } from '../../../../helpers/testId'
 import { ModificationRequestPageDTO } from '../../../../modules/modificationRequest'
@@ -12,9 +13,10 @@ import {
 
 interface DemandeStatusProps {
   modificationRequest: ModificationRequestPageDTO
+  role: User['role']
 }
 
-export const DemandeStatus = ({ modificationRequest }: DemandeStatusProps) => {
+export const DemandeStatus = ({ modificationRequest, role }: DemandeStatusProps) => {
   const { respondedOn, respondedBy, responseFile, project, status } = modificationRequest
   return (
     <div
@@ -30,7 +32,7 @@ export const DemandeStatus = ({ modificationRequest }: DemandeStatusProps) => {
       </span>{' '}
       {respondedOn && respondedBy && `par ${respondedBy} le ${formatDate(respondedOn)}`}
       <StatusForDelai modificationRequest={modificationRequest} />
-      {responseFile && (
+      {responseFile && status !== 'demande confirmée' && (
         <div>
           <a
             href={ROUTES.DOWNLOAD_PROJECT_FILE(responseFile.id, responseFile.filename)}
@@ -41,7 +43,7 @@ export const DemandeStatus = ({ modificationRequest }: DemandeStatusProps) => {
           </a>
         </div>
       )}
-      <Confirmation modificationRequest={modificationRequest} />
+      <Confirmation role={role} modificationRequest={modificationRequest} />
     </div>
   )
 }
@@ -75,16 +77,16 @@ const StatusForDelai = ({ modificationRequest }: StatusForDelaiProps) => {
 
 interface ConfirmationProps {
   modificationRequest: ModificationRequestPageDTO
+  role: User['role']
 }
-const Confirmation = ({ modificationRequest }: ConfirmationProps) => {
-  const { versionDate, type, id, status } = modificationRequest
-  if (status === 'en attente de confirmation') {
+const Confirmation = ({ modificationRequest, role }: ConfirmationProps) => {
+  const { versionDate, id, status } = modificationRequest
+  if (status === 'en attente de confirmation' && role === 'porteur-projet') {
     return (
       <div>
         <form action={ROUTES.CONFIRMER_DEMANDE_ACTION} method="post" style={{ margin: 0 }}>
           <input type="hidden" name="modificationRequestId" value={id} />
           <input type="hidden" name="versionDate" value={versionDate.getTime()} />
-          <input type="hidden" name="type" value={type} />
           <button className="button" type="submit" {...dataId('submit-button')}>
             Je confirme ma demande
           </button>

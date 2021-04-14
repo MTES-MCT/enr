@@ -45,19 +45,19 @@ export const AdminResponseForm = ({ modificationRequest, children }: AdminRespon
         className="button"
         type="submit"
         name="submitAccept"
-        data-confirm={`Etes-vous sur de vouloir accepter la demande de ${ModificationRequestTitleByType[type]} ?`}
+        data-confirm={`Etes-vous sur de vouloir accepter la demande ${ModificationRequestTitleByType[type]} ?`}
         {...dataId('submit-button')}
       >
-        Accepter la demande de {ModificationRequestTitleByType[type]}
+        Accepter la demande {ModificationRequestTitleByType[type]}
       </button>
       <button
         className="button warning"
         type="submit"
-        data-confirm={`Etes-vous sur de vouloir refuser la demande de ${ModificationRequestTitleByType[type]} ?`}
+        data-confirm={`Etes-vous sur de vouloir refuser la demande ${ModificationRequestTitleByType[type]} ?`}
         name="submitRefuse"
         {...dataId('submit-button-alt')}
       >
-        Refuser la demande de {ModificationRequestTitleByType[type]}
+        Refuser la demande {ModificationRequestTitleByType[type]}
       </button>
     </form>
   )
