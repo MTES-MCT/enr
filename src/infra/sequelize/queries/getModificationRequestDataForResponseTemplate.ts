@@ -4,15 +4,25 @@ import { ResultAsync, errAsync, logger, ok, wrapInfra } from '../../../core/util
 import { getAppelOffre } from '../../../dataAccess/inMemory/appelOffre'
 import { makeProjectIdentifier } from '../../../entities'
 import { formatDate } from '../../../helpers/formatDate'
+import { GetPeriode } from '../../../modules/appelOffre'
 import {
   GetModificationRequestDateForResponseTemplate,
   ModificationRequestDateForResponseTemplateDTO,
 } from '../../../modules/modificationRequest'
 import { EntityNotFoundError, InfraNotAvailableError } from '../../../modules/shared'
 
-export const makeGetModificationRequestDataForResponseTemplate = (
-  models
-): GetModificationRequestDateForResponseTemplate => (modificationRequestId, user) => {
+interface GetModificationRequestDateForResponseTemplateDeps {
+  models: any
+  getPeriode: GetPeriode
+}
+
+export const makeGetModificationRequestDataForResponseTemplate = ({
+  models,
+  getPeriode,
+}: GetModificationRequestDateForResponseTemplateDeps): GetModificationRequestDateForResponseTemplate => (
+  modificationRequestId,
+  user
+) => {
   const { ModificationRequest, Project, File, User } = models
   if (!ModificationRequest || !Project || !File || !User)
     return errAsync(new InfraNotAvailableError())
@@ -38,8 +48,21 @@ export const makeGetModificationRequestDataForResponseTemplate = (
         return okAsync({ modificationRequest, previousRequest: null })
       }
     )
-    .andThen(({ modificationRequest, previousRequest }) => {
-      const { type, project, requestedOn, delayInMonths, justification } = modificationRequest
+    .andThen(({ modificationRequest, previousRequest }) =>
+      getPeriode(
+        modificationRequest.project.appelOffreId,
+        modificationRequest.project.periodeId
+      ).map((periodeDetails) => ({ modificationRequest, previousRequest, periodeDetails }))
+    )
+    .andThen(({ modificationRequest, previousRequest, periodeDetails }) => {
+      const {
+        type,
+        project,
+        requestedOn,
+        delayInMonths,
+        justification,
+        status,
+      } = modificationRequest
 
       const { appelOffreId, periodeId, familleId } = project
       const appelOffre = getAppelOffre({ appelOffreId, periodeId })
@@ -96,6 +119,7 @@ export const makeGetModificationRequestDataForResponseTemplate = (
         refPotentiel: makeProjectIdentifier(project),
         nomRepresentantLegal,
         nomCandidat,
+        status,
         adresseCandidat: details['Adresse postale du contact'],
         email,
         titrePeriode: periode.title,
@@ -129,6 +153,19 @@ export const makeGetModificationRequestDataForResponseTemplate = (
             dateNotification: formatDate(notifiedOn),
             dureeDelaiDemandeEnMois: delayInMonths.toString(),
             ..._makePreviousDelaiFromPreviousRequest(previousRequest),
+          } as ModificationRequestDateForResponseTemplateDTO)
+        case 'abandon':
+          return ok({
+            ...commonData,
+            referenceParagrapheAbandon:
+              periodeDetails[
+                'Référence du paragraphe dédié à l’engagement de réalisation ou aux modalités d’abandon'
+              ],
+            contenuParagrapheAbandon:
+              periodeDetails[
+                'Dispositions liées à l’engagement de réalisation ou aux modalités d’abandon'
+              ],
+            dateNotification: formatDate(notifiedOn),
           } as ModificationRequestDateForResponseTemplateDTO)
         case 'recours':
           return ok({

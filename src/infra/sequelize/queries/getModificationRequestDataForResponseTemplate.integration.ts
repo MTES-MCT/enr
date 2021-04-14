@@ -8,11 +8,26 @@ import { UniqueEntityID } from '../../../core/domain'
 import { makeProjectIdentifier, makeUser } from '../../../entities'
 import { formatDate } from '../../../helpers/formatDate'
 import moment from 'moment'
+import { okAsync } from 'neverthrow'
 
 describe('Sequelize getModificationRequestDataForResponseTemplate', () => {
   const getModificationRequestDataForResponseTemplate = makeGetModificationRequestDataForResponseTemplate(
-    models
+    {
+      models,
+      getPeriode: jest.fn((appelOffreId: string, periodeId: string) =>
+        okAsync({
+          appelOffreId,
+          periodeId,
+          'Référence du paragraphe dédié à l’engagement de réalisation ou aux modalités d’abandon':
+            'referenceParagrapheAbandon',
+          'Dispositions liées à l’engagement de réalisation ou aux modalités d’abandon':
+            'contenuParagrapheAbandon',
+        })
+      ),
+    }
   )
+
+  const { Project, ModificationRequest, User, File } = models
 
   const projectId = new UniqueEntityID().toString()
   const fileId = new UniqueEntityID().toString()
@@ -56,17 +71,13 @@ describe('Sequelize getModificationRequestDataForResponseTemplate', () => {
       // Create the tables and remove all data
       await resetDatabase()
 
-      const ProjectModel = models.Project
-      await ProjectModel.create(project)
+      await Project.create(project)
 
-      const FileModel = models.File
-      await FileModel.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+      await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
 
-      const UserModel = models.User
-      await UserModel.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+      await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
 
-      const ModificationRequestModel = models.ModificationRequest
-      await ModificationRequestModel.create({
+      await ModificationRequest.create({
         id: modificationRequestId,
         projectId,
         userId,
@@ -95,6 +106,8 @@ describe('Sequelize getModificationRequestDataForResponseTemplate', () => {
       expect(modificationRequestDTO).toMatchObject({
         suiviPar: 'John Doe',
         refPotentiel: makeProjectIdentifier(project),
+
+        status: 'envoyée',
 
         nomRepresentantLegal: 'nomRepresentantLegal',
         nomCandidat: 'nomCandidat',
@@ -125,17 +138,13 @@ describe('Sequelize getModificationRequestDataForResponseTemplate', () => {
         // Create the tables and remove all data
         await resetDatabase()
 
-        const ProjectModel = models.Project
-        await ProjectModel.create(project)
+        await Project.create(project)
 
-        const FileModel = models.File
-        await FileModel.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+        await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
 
-        const UserModel = models.User
-        await UserModel.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+        await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
 
-        const ModificationRequestModel = models.ModificationRequest
-        await ModificationRequestModel.create({
+        await ModificationRequest.create({
           id: modificationRequestId,
           projectId,
           userId,
@@ -182,17 +191,13 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
         // Create the tables and remove all data
         await resetDatabase()
 
-        const ProjectModel = models.Project
-        await ProjectModel.create(project)
+        await Project.create(project)
 
-        const FileModel = models.File
-        await FileModel.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+        await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
 
-        const UserModel = models.User
-        await UserModel.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+        await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
 
-        const ModificationRequestModel = models.ModificationRequest
-        await ModificationRequestModel.create({
+        await ModificationRequest.create({
           id: modificationRequestId,
           projectId,
           userId,
@@ -208,7 +213,7 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
         })
 
         // Add a previous request that is accepted
-        await ModificationRequestModel.create({
+        await ModificationRequest.create({
           id: new UniqueEntityID().toString(),
           projectId,
           userId,
@@ -255,8 +260,7 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
       // Create the tables and remove all data
       await resetDatabase()
 
-      const ProjectModel = models.Project
-      await ProjectModel.create({
+      await Project.create({
         ...project,
         isFinancementParticipatif: true,
         isInvestissementParticipatif: false,
@@ -264,14 +268,11 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
         motifsElimination: 'Non instruit: blabla',
       })
 
-      const FileModel = models.File
-      await FileModel.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+      await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
 
-      const UserModel = models.User
-      await UserModel.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+      await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
 
-      const ModificationRequestModel = models.ModificationRequest
-      await ModificationRequestModel.create({
+      await ModificationRequest.create({
         id: modificationRequestId,
         projectId,
         userId,
@@ -327,6 +328,55 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
         paragrapheEngagementIPFP: '3.2.6',
         renvoiModification: '5.4',
         delaiRealisationTexte: 'vingt-quatre (24) mois',
+      })
+    })
+  })
+
+  describe('when type is abandon', () => {
+    describe('when abandon is granted without confirmation', () => {
+      beforeAll(async () => {
+        // Create the tables and remove all data
+        await resetDatabase()
+
+        await Project.create(project)
+        await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+        await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+        await ModificationRequest.create({
+          id: modificationRequestId,
+          projectId,
+          userId,
+          fileId,
+          type: 'abandon',
+          requestedOn: 123,
+          respondedOn: 321,
+          respondedBy: userId2,
+          status: 'envoyée',
+          justification: 'justification',
+          versionDate,
+          delayInMonths: 2,
+        })
+      })
+
+      it('should return abandon specific modification request info fields', async () => {
+        const modificationRequestResult = await getModificationRequestDataForResponseTemplate(
+          modificationRequestId.toString(),
+          fakeAdminUser
+        )
+
+        const referenceParagrapheAbandon = 'referenceParagrapheAbandon'
+        const contenuParagrapheAbandon = 'contenuParagrapheAbandon'
+
+        expect(modificationRequestResult.isOk()).toBe(true)
+        if (modificationRequestResult.isErr()) return
+
+        const modificationRequestDTO = modificationRequestResult.value
+
+        expect(modificationRequestDTO).toMatchObject({
+          type: 'abandon',
+          dateNotification: formatDate(321),
+          referenceParagrapheAbandon,
+          contenuParagrapheAbandon,
+        })
       })
     })
   })

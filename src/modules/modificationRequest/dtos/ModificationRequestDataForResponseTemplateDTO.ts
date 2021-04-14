@@ -1,6 +1,10 @@
+import { ModificationRequestStatusDTO } from './ModificationRequestListItemDTO'
+
 export type ModificationRequestDateForResponseTemplateDTO = {
   suiviPar: string
   refPotentiel: string
+
+  status: ModificationRequestStatusDTO
 
   nomRepresentantLegal: string
   nomCandidat: string
@@ -20,7 +24,7 @@ export type ModificationRequestDateForResponseTemplateDTO = {
 
   dateDemande: string
   justificationDemande: string
-} & (DelaiVariant | RecoursVariant)
+} & (DelaiVariant | RecoursVariant | AbandonVariant)
 
 type DelaiVariant = {
   type: 'delai'
@@ -69,4 +73,16 @@ type RecoursVariant = {
   paragrapheEngagementIPFP: string
   renvoiModification: string
   delaiRealisationTexte: string
+}
+
+type AbandonVariant = {
+  type: 'abandon'
+
+  dateNotification: string
+
+  referenceParagrapheAbandon: string
+  contenuParagrapheAbandon: string
+
+  dateDemandeConfirmation: string
+  dateConfirmation: string
 }
