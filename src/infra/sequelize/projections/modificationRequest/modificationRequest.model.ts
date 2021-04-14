@@ -90,6 +90,18 @@ export const MakeModificationRequestModel = (sequelize) => {
         type: DataTypes.UUID,
         allowNull: true,
       },
+      confirmationRequestedOn: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      confirmedBy: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
+      confirmedOn: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,

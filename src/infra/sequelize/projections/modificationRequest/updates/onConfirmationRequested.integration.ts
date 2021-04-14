@@ -33,6 +33,10 @@ describe('modificationRequest.onConfirmationRequested', () => {
           confirmationRequestedBy: userId,
           responseFileId: fileId,
         },
+        original: {
+          version: 1,
+          occurredAt: new Date(123),
+        },
       })
     )
   })
@@ -47,8 +51,9 @@ describe('modificationRequest.onConfirmationRequested', () => {
     expect(updatedModificationRequest.responseFileId).toEqual(fileId)
   })
 
-  it('should set confirmationRequestedBy', async () => {
+  it('should set confirmationRequestedBy and confirmationRequestedOn', async () => {
     const updatedModificationRequest = await ModificationRequest.findByPk(modificationRequestId)
     expect(updatedModificationRequest.confirmationRequestedBy).toEqual(userId)
+    expect(updatedModificationRequest.confirmationRequestedOn).toEqual(123)
   })
 })

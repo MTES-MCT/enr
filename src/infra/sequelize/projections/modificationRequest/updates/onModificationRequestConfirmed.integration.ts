@@ -25,19 +25,29 @@ describe('modificationRequest.onModificationRequestConfirmed', () => {
       requestedOn: 1,
       requestedBy: userId,
     })
-  })
 
-  it('should update status to demande confirmée', async () => {
     await onModificationRequestConfirmed(models)(
       new ModificationRequestConfirmed({
         payload: {
           modificationRequestId,
           confirmedBy: userId,
         },
+        original: {
+          version: 1,
+          occurredAt: new Date(123),
+        },
       })
     )
+  })
 
+  it('should update status to demande confirmée', async () => {
     const updatedModificationRequest = await ModificationRequest.findByPk(modificationRequestId)
     expect(updatedModificationRequest.status).toEqual('demande confirmée')
+  })
+
+  it('should set confirmedBy and confirmedOn', async () => {
+    const updatedModificationRequest = await ModificationRequest.findByPk(modificationRequestId)
+    expect(updatedModificationRequest.confirmedBy).toEqual(userId)
+    expect(updatedModificationRequest.confirmedOn).toEqual(123)
   })
 })

@@ -17,6 +17,7 @@ export const onConfirmationRequested = (models) => async (event: ConfirmationReq
   instance.status = 'en attente de confirmation'
   instance.responseFileId = responseFileId
   instance.confirmationRequestedBy = confirmationRequestedBy
+  instance.confirmationRequestedOn = event.occurredAt.getTime()
   instance.versionDate = event.occurredAt
 
   try {
