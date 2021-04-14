@@ -363,9 +363,6 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
           fakeAdminUser
         )
 
-        const referenceParagrapheAbandon = 'referenceParagrapheAbandon'
-        const contenuParagrapheAbandon = 'contenuParagrapheAbandon'
-
         expect(modificationRequestResult.isOk()).toBe(true)
         if (modificationRequestResult.isErr()) return
 
@@ -374,8 +371,52 @@ En cas de dépassement de ce délai, la durée de contrat mentionnée au 7.1.1 e
         expect(modificationRequestDTO).toMatchObject({
           type: 'abandon',
           dateNotification: formatDate(321),
-          referenceParagrapheAbandon,
-          contenuParagrapheAbandon,
+          referenceParagrapheAbandon: 'referenceParagrapheAbandon',
+          contenuParagrapheAbandon: 'contenuParagrapheAbandon',
+        })
+      })
+    })
+
+    describe('when abandon is granted after confirmation', () => {
+      beforeAll(async () => {
+        // Create the tables and remove all data
+        await resetDatabase()
+
+        await Project.create(project)
+        await File.create(makeFakeFile({ id: fileId, filename: 'filename' }))
+        await User.create(makeFakeUser({ id: userId, fullName: 'John Doe' }))
+        await ModificationRequest.create({
+          id: modificationRequestId,
+          projectId,
+          userId,
+          fileId,
+          type: 'abandon',
+          requestedOn: 123,
+          respondedOn: 321,
+          respondedBy: userId2,
+          status: 'demande confirmée',
+          justification: 'justification',
+          confirmationRequestedOn: 6780000000,
+          confirmedOn: 7890000000,
+          versionDate,
+          delayInMonths: 2,
+        })
+      })
+
+      it('should include dateDemandeConfirmation and dateConfirmation', async () => {
+        const modificationRequestResult = await getModificationRequestDataForResponseTemplate(
+          modificationRequestId.toString(),
+          fakeAdminUser
+        )
+
+        expect(modificationRequestResult.isOk()).toBe(true)
+        if (modificationRequestResult.isErr()) return
+
+        const modificationRequestDTO = modificationRequestResult.value
+
+        expect(modificationRequestDTO).toMatchObject({
+          dateDemandeConfirmation: formatDate(6780000000),
+          dateConfirmation: formatDate(7890000000),
         })
       })
     })

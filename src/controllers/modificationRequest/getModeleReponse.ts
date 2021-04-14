@@ -4,9 +4,11 @@ import path from 'path'
 import sanitize from 'sanitize-filename'
 import { eventStore, getModificationRequestDataForResponseTemplate } from '../../config'
 import { ModificationRequest } from '../../entities'
+import modificationRequest from '../../entities/modificationRequest'
 import { fillDocxTemplate } from '../../helpers/fillDocxTemplate'
 import {
   ModificationRequestDateForResponseTemplateDTO,
+  ModificationRequestStatusDTO,
   ResponseTemplateDownloaded,
 } from '../../modules/modificationRequest'
 import { EntityNotFoundError } from '../../modules/shared'
@@ -29,16 +31,18 @@ v1Router.get(
 
     await getModificationRequestDataForResponseTemplate(modificationRequestId, request.user).match(
       async (data) => {
-        await eventStore.publish(
-          new ResponseTemplateDownloaded({
-            payload: {
-              modificationRequestId,
-              downloadedBy: request.user.id,
-            },
-          })
-        )
+        if (data.status === 'envoyée') {
+          await eventStore.publish(
+            new ResponseTemplateDownloaded({
+              payload: {
+                modificationRequestId,
+                downloadedBy: request.user.id,
+              },
+            })
+          )
+        }
 
-        return response.sendFile(path.resolve(process.cwd(), await makeRecoursTemplate(data)))
+        return response.sendFile(path.resolve(process.cwd(), await makeResponseTemplate(data)))
       },
       async (err): Promise<any> => {
         if (err instanceof EntityNotFoundError) {
@@ -73,11 +77,19 @@ const TemplateByType: Record<ModificationRequest['type'], string> = {
   producteur: '',
   puissance: '',
   recours: 'Modèle réponse Recours gracieux - dynamique.docx',
-  abandon: '',
+  abandon: 'Modèle réponse Abandon - dynamique.docx',
   delai: 'Modèle réponse Prolongation de délai - dynamique.docx',
 }
 
-async function makeRecoursTemplate(
+const getTemplate = ({ type, status }: ModificationRequestDateForResponseTemplateDTO) => {
+  if (type === 'abandon' && status === 'demande confirmée') {
+    return 'Modèle réponse Abandon après confirmation - dynamique.docx'
+  }
+
+  return TemplateByType[type]
+}
+
+async function makeResponseTemplate(
   data: ModificationRequestDateForResponseTemplateDTO
 ): Promise<string> {
   const now = new Date()
@@ -90,14 +102,7 @@ async function makeRecoursTemplate(
     )
   )
 
-  const templatePath = path.resolve(
-    __dirname,
-    '..',
-    '..',
-    'views',
-    'template',
-    TemplateByType[data.type]
-  )
+  const templatePath = path.resolve(__dirname, '..', '..', 'views', 'template', getTemplate(data))
 
   await fillDocxTemplate({
     templatePath,

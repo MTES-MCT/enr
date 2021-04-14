@@ -62,6 +62,8 @@ export const makeGetModificationRequestDataForResponseTemplate = ({
         delayInMonths,
         justification,
         status,
+        confirmationRequestedOn,
+        confirmedOn,
       } = modificationRequest
 
       const { appelOffreId, periodeId, familleId } = project
@@ -166,6 +168,8 @@ export const makeGetModificationRequestDataForResponseTemplate = ({
                 'Dispositions liées à l’engagement de réalisation ou aux modalités d’abandon'
               ],
             dateNotification: formatDate(notifiedOn),
+            dateDemandeConfirmation: confirmationRequestedOn && formatDate(confirmationRequestedOn),
+            dateConfirmation: confirmedOn && formatDate(confirmedOn),
           } as ModificationRequestDateForResponseTemplateDTO)
         case 'recours':
           return ok({
