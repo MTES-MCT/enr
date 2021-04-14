@@ -5,6 +5,8 @@ import {
   ModificationRequested,
   ModificationRequestAccepted,
   ModificationRequestRejected,
+  ModificationRequestConfirmed,
+  ConfirmationRequested,
 } from './events'
 import { StatusPreventsAcceptingError } from './errors'
 import { makeModificationRequest } from './ModificationRequest'
@@ -36,6 +38,95 @@ describe('Modification.acceptRecours()', () => {
 
     beforeAll(() => {
       expect(fakeModificationRequest.status).toEqual('envoyée')
+
+      const res = fakeModificationRequest.accept({ acceptedBy: fakeUser, responseFileId })
+      expect(res.isOk()).toBe(true)
+    })
+
+    it('should emit ModificationRequestAccepted', () => {
+      expect(fakeModificationRequest.pendingEvents).not.toHaveLength(0)
+
+      const targetEvent = fakeModificationRequest.pendingEvents.find(
+        (item) => item.type === ModificationRequestAccepted.type
+      ) as ModificationRequestAccepted | undefined
+      expect(targetEvent).toBeDefined()
+      if (!targetEvent) return
+
+      expect(targetEvent.payload.modificationRequestId).toEqual(modificationRequestId.toString())
+      expect(targetEvent.payload.responseFileId).toEqual(responseFileId)
+    })
+  })
+
+  describe('when demande status is demande confirmée', () => {
+    const fakeModificationRequest = UnwrapForTest(
+      makeModificationRequest({
+        modificationRequestId,
+        history: [
+          new ModificationRequested({
+            payload: {
+              modificationRequestId: modificationRequestId.toString(),
+              projectId: projectId.toString(),
+              type: 'recours',
+              requestedBy: fakeUser.id,
+            },
+          }),
+          new ModificationRequestConfirmed({
+            payload: {
+              modificationRequestId: modificationRequestId.toString(),
+              confirmedBy: fakeUser.id,
+            },
+          }),
+        ],
+      })
+    )
+
+    beforeAll(() => {
+      expect(fakeModificationRequest.status).toEqual('demande confirmée')
+
+      const res = fakeModificationRequest.accept({ acceptedBy: fakeUser, responseFileId })
+      expect(res.isOk()).toBe(true)
+    })
+
+    it('should emit ModificationRequestAccepted', () => {
+      expect(fakeModificationRequest.pendingEvents).not.toHaveLength(0)
+
+      const targetEvent = fakeModificationRequest.pendingEvents.find(
+        (item) => item.type === ModificationRequestAccepted.type
+      ) as ModificationRequestAccepted | undefined
+      expect(targetEvent).toBeDefined()
+      if (!targetEvent) return
+
+      expect(targetEvent.payload.modificationRequestId).toEqual(modificationRequestId.toString())
+      expect(targetEvent.payload.responseFileId).toEqual(responseFileId)
+    })
+  })
+
+  describe('when demande status is en attente de confirmation', () => {
+    const fakeModificationRequest = UnwrapForTest(
+      makeModificationRequest({
+        modificationRequestId,
+        history: [
+          new ModificationRequested({
+            payload: {
+              modificationRequestId: modificationRequestId.toString(),
+              projectId: projectId.toString(),
+              type: 'recours',
+              requestedBy: fakeUser.id,
+            },
+          }),
+          new ConfirmationRequested({
+            payload: {
+              modificationRequestId: modificationRequestId.toString(),
+              confirmationRequestedBy: fakeUser.id,
+              responseFileId: '',
+            },
+          }),
+        ],
+      })
+    )
+
+    beforeAll(() => {
+      expect(fakeModificationRequest.status).toEqual('en attente de confirmation')
 
       const res = fakeModificationRequest.accept({ acceptedBy: fakeUser, responseFileId })
       expect(res.isOk()).toBe(true)

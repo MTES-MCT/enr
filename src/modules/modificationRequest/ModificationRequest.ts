@@ -46,6 +46,7 @@ export type ModificationRequestStatus =
   | 'annulée'
   | 'en attente de confirmation'
   | 'demande confirmée'
+
 export type ModificationRequestAcceptanceParams =
   | { type: 'recours'; newNotificationDate: Date }
   | { type: 'delai'; delayInMonths: number }
@@ -103,7 +104,7 @@ export const makeModificationRequest = (args: {
   // public methods
   return ok({
     accept: function ({ acceptedBy, responseFileId, params }) {
-      if (props.status !== 'envoyée') {
+      if (!['envoyée', 'en attente de confirmation', 'demande confirmée'].includes(props.status)) {
         return err(new StatusPreventsAcceptingError(props.status))
       }
 
@@ -121,7 +122,7 @@ export const makeModificationRequest = (args: {
       return ok(null)
     },
     reject: function (rejectedBy, responseFileId) {
-      if (props.status !== 'envoyée') {
+      if (!['envoyée', 'en attente de confirmation', 'demande confirmée'].includes(props.status)) {
         return err(new StatusPreventsRejectingError(props.status))
       }
 
@@ -229,6 +230,9 @@ export const makeModificationRequest = (args: {
         break
       case ConfirmationRequested.type:
         props.status = 'en attente de confirmation'
+        break
+      case ModificationRequestConfirmed.type:
+        props.status = 'demande confirmée'
         break
       default:
         // ignore other event types
