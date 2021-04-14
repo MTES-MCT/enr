@@ -6,6 +6,7 @@ import { makeFakeAppelOffre } from '../../../__tests__/fixtures/aggregates'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import { EntityNotFoundError, InfraNotAvailableError } from '../../shared'
 import { AppelOffre } from '../AppelOffre'
+import { AppelOffreDTO } from '../dtos'
 import { MissingAppelOffreIdError } from '../errors'
 import { AppelOffreCreated } from '../events'
 import { makeImportAppelOffreData } from './importAppelOffreData'
@@ -24,7 +25,13 @@ describe('importAppelOffreData use-case', () => {
       subscribe: jest.fn(),
     }
 
-    const importAppelOffreData = makeImportAppelOffreData({ appelOffreRepo, eventBus })
+    const getAppelOffreList = jest.fn(() => okAsync<AppelOffreDTO[], InfraNotAvailableError>([]))
+
+    const importAppelOffreData = makeImportAppelOffreData({
+      appelOffreRepo,
+      eventBus,
+      getAppelOffreList,
+    })
 
     it('should publish AppelOffreCreated', async () => {
       const res = await importAppelOffreData({
@@ -59,7 +66,15 @@ describe('importAppelOffreData use-case', () => {
       subscribe: jest.fn(),
     }
 
-    const importAppelOffreData = makeImportAppelOffreData({ appelOffreRepo, eventBus })
+    const getAppelOffreList = jest.fn(() =>
+      okAsync<AppelOffreDTO[], InfraNotAvailableError>([{ appelOffreId: 'appelOffreId' }])
+    )
+
+    const importAppelOffreData = makeImportAppelOffreData({
+      appelOffreRepo,
+      eventBus,
+      getAppelOffreList,
+    })
 
     it('should call update on the appelOffre and save it', async () => {
       const res = await importAppelOffreData({
@@ -81,6 +96,48 @@ describe('importAppelOffreData use-case', () => {
     })
   })
 
+  describe('when an existing appel offre is no longer present in data lines', () => {
+    const fakeAppelOffre = makeFakeAppelOffre()
+
+    const appelOffreRepo: Repository<AppelOffre> = {
+      save: jest.fn(() => okAsync(null)),
+      load: jest.fn(() => okAsync(fakeAppelOffre)),
+    }
+
+    const eventBus = {
+      publish: jest.fn(),
+      subscribe: jest.fn(),
+    }
+
+    const getAppelOffreList = jest.fn(() =>
+      okAsync<AppelOffreDTO[], InfraNotAvailableError>([{ appelOffreId: 'appelOffreId1' }])
+    )
+
+    const importAppelOffreData = makeImportAppelOffreData({
+      appelOffreRepo,
+      eventBus,
+      getAppelOffreList,
+    })
+
+    it('should call remove on the appelOffre and save it', async () => {
+      const res = await importAppelOffreData({
+        dataLines: [],
+        importedBy: user,
+      })
+
+      expect(res.isOk()).toBe(true)
+      if (res.isErr()) return
+
+      expect(appelOffreRepo.load).toHaveBeenCalledWith(new UniqueEntityID('appelOffreId1'))
+
+      expect(fakeAppelOffre.remove).toHaveBeenCalledWith({
+        removedBy: user,
+      })
+
+      expect(appelOffreRepo.save).toHaveBeenCalledWith(fakeAppelOffre)
+    })
+  })
+
   describe('when a data line is missing an appel offre id', () => {
     const appelOffreRepo: Repository<AppelOffre> = {
       save: jest.fn(),
@@ -92,7 +149,13 @@ describe('importAppelOffreData use-case', () => {
       subscribe: jest.fn(),
     }
 
-    const importAppelOffreData = makeImportAppelOffreData({ appelOffreRepo, eventBus })
+    const getAppelOffreList = jest.fn(() => okAsync<AppelOffreDTO[], InfraNotAvailableError>([]))
+
+    const importAppelOffreData = makeImportAppelOffreData({
+      appelOffreRepo,
+      eventBus,
+      getAppelOffreList,
+    })
 
     it('should return a AppelOffreDoesNotExistError', async () => {
       const res = await importAppelOffreData({

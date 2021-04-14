@@ -4,7 +4,13 @@ import { UnwrapForTest } from '../../types'
 import makeFakeUser from '../../__tests__/fixtures/user'
 import { UnauthorizedError } from '../shared'
 import { makeAppelOffre } from './AppelOffre'
-import { AppelOffreCreated, AppelOffreUpdated, PeriodeCreated, PeriodeUpdated } from './events'
+import {
+  AppelOffreCreated,
+  AppelOffreRemoved,
+  AppelOffreUpdated,
+  PeriodeCreated,
+  PeriodeUpdated,
+} from './events'
 
 describe('AppelOffre', () => {
   describe('update()', () => {
@@ -86,6 +92,43 @@ describe('AppelOffre', () => {
 
         expect(res.isErr()).toBe(true)
         expect(res._unsafeUnwrapErr()).toBeInstanceOf(UnauthorizedError)
+      })
+    })
+  })
+
+  describe('remove()', () => {
+    const appelOffreId = new UniqueEntityID()
+
+    describe('when appel offre has not been removed yet', () => {
+      const fakeUser = UnwrapForTest(makeUser(makeFakeUser({ role: 'admin' })))
+
+      const appelOffre = makeAppelOffre({
+        id: appelOffreId,
+        events: [
+          new AppelOffreCreated({
+            payload: {
+              appelOffreId: appelOffreId.toString(),
+              createdBy: '',
+              data: {},
+            },
+          }),
+        ],
+      })._unsafeUnwrap()
+
+      it('should trigger AppelOffreRemoved', () => {
+        appelOffre
+          .remove({
+            removedBy: fakeUser,
+          })
+          ._unsafeUnwrap()
+
+        expect(appelOffre.pendingEvents).toHaveLength(1)
+        const event = appelOffre.pendingEvents[0]
+        expect(event).toBeInstanceOf(AppelOffreRemoved)
+        expect((event as AppelOffreRemoved).payload).toMatchObject({
+          appelOffreId: appelOffreId.toString(),
+          removedBy: fakeUser.id,
+        })
       })
     })
   })

@@ -6,10 +6,12 @@ import { EntityNotFoundError, InfraNotAvailableError, UnauthorizedError } from '
 import { AppelOffre } from '../AppelOffre'
 import { MissingAppelOffreIdError } from '../errors'
 import { AppelOffreCreated } from '../events'
+import { GetAppelOffreList } from '../queries'
 
 interface ImportAppelOffreDataDeps {
   appelOffreRepo: Repository<AppelOffre>
   eventBus: EventBus
+  getAppelOffreList: GetAppelOffreList
 }
 
 interface ImportAppelOffreDataArgs {
@@ -24,38 +26,57 @@ export const makeImportAppelOffreData = (deps: ImportAppelOffreDataDeps) => ({
   null,
   (InfraNotAvailableError | UnauthorizedError | MissingAppelOffreIdError)[]
 > => {
-  const res: ResultAsync<
-    null,
-    InfraNotAvailableError | UnauthorizedError | MissingAppelOffreIdError
-  >[] = dataLines.map((dataLine, index) => {
-    const { appelOffreId, ...data } = dataLine
+  return deps
+    .getAppelOffreList()
+    .mapErr((e): (InfraNotAvailableError | UnauthorizedError | MissingAppelOffreIdError)[] => [e])
+    .andThen((appelOffreList) => {
+      const removals = appelOffreList
+        .filter(
+          ({ appelOffreId }) =>
+            !dataLines.find((dataLine) => dataLine.appelOffreId === appelOffreId)
+        )
+        .map(({ appelOffreId }) => {
+          return deps.appelOffreRepo
+            .load(new UniqueEntityID(appelOffreId))
+            .andThen((appelOffre) =>
+              appelOffre.remove({ removedBy: importedBy }).map(() => appelOffre)
+            )
+            .andThen((appelOffre) => deps.appelOffreRepo.save(appelOffre))
+        })
 
-    if (!appelOffreId) {
-      return errAsync(new MissingAppelOffreIdError(index + 1))
-    }
+      const updates: ResultAsync<
+        null,
+        InfraNotAvailableError | UnauthorizedError | MissingAppelOffreIdError
+      >[] = dataLines.map((dataLine, index) => {
+        const { appelOffreId, ...data } = dataLine
 
-    return deps.appelOffreRepo
-      .load(new UniqueEntityID(appelOffreId))
-      .andThen((appelOffre) =>
-        appelOffre.update({ data, updatedBy: importedBy }).map(() => appelOffre)
-      )
-      .andThen((appelOffre) => deps.appelOffreRepo.save(appelOffre))
-      .orElse((e) => {
-        if (e instanceof EntityNotFoundError) {
-          return deps.eventBus.publish(
-            new AppelOffreCreated({
-              payload: {
-                appelOffreId,
-                data,
-                createdBy: importedBy.id,
-              },
-            })
-          )
+        if (!appelOffreId) {
+          return errAsync(new MissingAppelOffreIdError(index + 1))
         }
 
-        return errAsync(e)
-      })
-  })
+        return deps.appelOffreRepo
+          .load(new UniqueEntityID(appelOffreId))
+          .andThen((appelOffre) =>
+            appelOffre.update({ data, updatedBy: importedBy }).map(() => appelOffre)
+          )
+          .andThen((appelOffre) => deps.appelOffreRepo.save(appelOffre))
+          .orElse((e) => {
+            if (e instanceof EntityNotFoundError) {
+              return deps.eventBus.publish(
+                new AppelOffreCreated({
+                  payload: {
+                    appelOffreId,
+                    data,
+                    createdBy: importedBy.id,
+                  },
+                })
+              )
+            }
 
-  return combineWithAllErrors(res).map(() => null)
+            return errAsync(e)
+          })
+      })
+
+      return combineWithAllErrors([...removals, ...updates]).map(() => null)
+    })
 }

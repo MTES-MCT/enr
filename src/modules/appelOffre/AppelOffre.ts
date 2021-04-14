@@ -10,6 +10,7 @@ import {
   UnauthorizedError,
 } from '../shared'
 import { AppelOffreCreated, AppelOffreUpdated, PeriodeCreated, PeriodeUpdated } from './events'
+import { AppelOffreRemoved } from './events/AppelOffreRemoved'
 
 export interface AppelOffre extends EventStoreAggregate {
   update: (args: { data: any; updatedBy: User }) => Result<null, UnauthorizedError>
@@ -18,11 +19,13 @@ export interface AppelOffre extends EventStoreAggregate {
     data: any
     updatedBy: User
   }) => Result<null, UnauthorizedError>
+  remove: ({ removedBy: User }) => Result<null, never>
 }
 
 interface AppelOffreProps {
   data: any
   periodes: { periodeId: string; data: any }[]
+  removed: boolean
 }
 
 export const makeAppelOffre = (args: {
@@ -38,6 +41,7 @@ export const makeAppelOffre = (args: {
   const props: AppelOffreProps = {
     data: {},
     periodes: [],
+    removed: false,
   }
 
   const pendingEvents: DomainEvent[] = []
@@ -51,6 +55,10 @@ export const makeAppelOffre = (args: {
     if (_isError) {
       return err(new IllegalInitialStateForAggregateError())
     }
+  }
+
+  if (props.removed) {
+    return err(new EntityNotFoundError())
   }
 
   return ok({
@@ -72,6 +80,18 @@ export const makeAppelOffre = (args: {
           })
         )
       }
+
+      return ok(null)
+    },
+    remove({ removedBy }) {
+      _publishEvent(
+        new AppelOffreRemoved({
+          payload: {
+            appelOffreId: id.toString(),
+            removedBy: removedBy.id,
+          },
+        })
+      )
 
       return ok(null)
     },
@@ -133,12 +153,16 @@ export const makeAppelOffre = (args: {
     switch (event.type) {
       case AppelOffreCreated.type:
         props.data = data
+        props.removed = false
         break
       case AppelOffreUpdated.type:
         props.data = { ...props.data, ...delta }
         break
       case PeriodeCreated.type:
         props.periodes = [...props.periodes, { periodeId, data }]
+        break
+      case AppelOffreRemoved.type:
+        props.removed = true
         break
       case PeriodeUpdated.type:
         existingPeriode = props.periodes.find((periode) => periode.periodeId === periodeId)
