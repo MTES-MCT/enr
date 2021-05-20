@@ -6,13 +6,12 @@ import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { pathExists } from '../../helpers/pathExists'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.DEPOSER_ETAPE_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet']),
   upload.single('file'),
   asyncHandler(async (request, response) => {

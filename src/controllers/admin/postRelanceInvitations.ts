@@ -1,14 +1,13 @@
+import asyncHandler from 'express-async-handler'
 import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
 import { relanceInvitations } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 v1Router.post(
   routes.ADMIN_INVITATION_RELANCE_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
     const { appelOffreId, periodeId, keys } = request.body

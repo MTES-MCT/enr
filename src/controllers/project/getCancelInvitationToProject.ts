@@ -4,12 +4,11 @@ import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { EntityNotFoundError, UnauthorizedError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.get(
   routes.CANCEL_INVITATION_TO_PROJECT_ACTION(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet']),
   asyncHandler(async (request, response) => {
     const { projectAdmissionKeyId, projectId } = request.query as any

@@ -1,14 +1,12 @@
-import { REGIONS } from '../../entities'
+import asyncHandler from 'express-async-handler'
+import { inviteUser } from '../../config'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
-import { inviteUser } from '../../config'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 v1Router.post(
   routes.ADMIN_INVITE_USER_ACTION,
-  ensureLoggedIn(),
   ensureRole('admin'),
   asyncHandler(async (request, response) => {
     const { email, role } = request.body

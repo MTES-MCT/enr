@@ -1,13 +1,12 @@
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
 import { inviteUserToProject } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
 v1Router.post(
   routes.INVITE_USER_TO_PROJECT_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet']),
   asyncHandler(async (request, response) => {
     const { email, projectId } = request.body

@@ -5,13 +5,12 @@ import { addQueryParams } from '../../helpers/addQueryParams'
 import { parseCsv } from '../../helpers/parseCsv'
 import { InfraNotAvailableError, UnauthorizedError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.IMPORT_PERIODE_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec']),
   upload.single('periodesFile'),
   asyncHandler(async (request, response) => {

@@ -4,12 +4,11 @@ import { shouldUserAccessProject } from '../../config/useCases.config'
 import { EntityNotFoundError } from '../../modules/shared'
 import routes from '../../routes'
 import { ProjectDetailsPage } from '../../views/pages'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.get(
   routes.PROJECT_DETAILS(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet', 'acheteur-obligé']),
   asyncHandler(async (request, response) => {
     const { projectId } = request.params

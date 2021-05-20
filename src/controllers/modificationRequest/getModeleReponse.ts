@@ -12,12 +12,11 @@ import {
 import { EntityNotFoundError } from '../../modules/shared'
 import routes from '../../routes'
 import { shouldUserAccessProject } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.get(
   routes.TELECHARGER_MODELE_REPONSE(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal']),
   asyncHandler(async (request, response) => {
     const { projectId, modificationRequestId } = request.params

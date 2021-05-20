@@ -4,13 +4,12 @@ import { addQueryParams } from '../../helpers/addQueryParams'
 import { parseCsv } from '../../helpers/parseCsv'
 import routes from '../../routes'
 import { importProjects } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.IMPORT_PROJECTS_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec']),
   upload.single('candidats'),
   asyncHandler(async (request, response) => {

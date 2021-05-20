@@ -1,15 +1,12 @@
-import { projectAdmissionKeyRepo, userRepo } from '../../dataAccess'
-import { makePagination } from '../../helpers/paginate'
-import routes from '../../routes'
-import { Pagination } from '../../types'
-import { AdminUsersPage } from '../../views/pages'
-import { ensureLoggedIn, ensureRole } from '../auth'
-import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
+import { projectAdmissionKeyRepo, userRepo } from '../../dataAccess'
+import routes from '../../routes'
+import { AdminUsersPage } from '../../views/pages'
+import { ensureRole } from '../auth'
+import { v1Router } from '../v1Router'
 
 v1Router.get(
   routes.ADMIN_USERS,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
     const users = await userRepo.findAll({ role: ['acheteur-obligé', 'ademe'] })

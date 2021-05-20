@@ -134,10 +134,6 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
   })
 }
 
-export const ensureLoggedIn = () => {
-  return keycloak.protect()
-}
-
 export const ensureRole = (roles: User['role'] | User['role'][]) => {
   const roleList = Array.isArray(roles) ? roles : [roles]
 

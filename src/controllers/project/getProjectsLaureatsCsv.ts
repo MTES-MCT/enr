@@ -6,7 +6,7 @@ import { parseAsync } from 'json2csv'
 import { logger } from '../../core/utils'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { formatField, writeCsvOnDisk } from '../../helpers/csv'
 import { promises as fsPromises } from 'fs'
 import { Project } from '../../entities'
@@ -99,7 +99,6 @@ function _sortProjectsByRegionsAndDepartements(projects: Project[]) {
 
 v1Router.get(
   routes.ADMIN_DOWNLOAD_PROJECTS_LAUREATS_CSV,
-  ensureLoggedIn(),
   ensureRole('admin'),
   getProjectsLaureatsCsv
 )

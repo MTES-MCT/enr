@@ -6,13 +6,12 @@ import { IncompleteDataError } from '../../modules/shared'
 import routes from '../../routes'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { getUserProject } from '../../useCases'
 import { buildCertificate } from '../../views/certificates'
 
 v1Router.get(
   routes.PREVIEW_CANDIDATE_CERTIFICATE(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec']),
   asyncHandler(async (request, response) => {
     const { projectId } = request.params

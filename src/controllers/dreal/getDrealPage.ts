@@ -1,13 +1,12 @@
 import { projectAdmissionKeyRepo, userRepo } from '../../dataAccess'
 import routes from '../../routes'
 import { DrealListPage } from '../../views/pages'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
 v1Router.get(
   routes.ADMIN_DREAL_LIST,
-  ensureLoggedIn(),
   ensureRole('admin'),
   asyncHandler(async (request, response) => {
     // Get all dreal users

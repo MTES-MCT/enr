@@ -6,7 +6,7 @@ import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { IllegalProjectDataError } from '../../modules/project/errors'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
@@ -15,7 +15,7 @@ const FORMAT_DATE = 'DD/MM/YYYY'
 
 v1Router.post(
   routes.ADMIN_CORRECT_PROJECT_DATA_ACTION,
-  ensureLoggedIn(),
+
   upload.single('file'),
   ensureRole(['admin', 'dgec']),
   asyncHandler(async (request, response) => {

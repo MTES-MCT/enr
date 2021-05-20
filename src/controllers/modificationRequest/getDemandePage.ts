@@ -2,7 +2,7 @@ import { projectRepo } from '../../dataAccess'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { NewModificationRequestPage } from '../../views/pages'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
@@ -10,7 +10,6 @@ const ACTIONS = ['delai', 'actionnaire', 'puissance', 'producteur', 'abandon', '
 
 v1Router.get(
   routes.DEMANDE_GENERIQUE,
-  ensureLoggedIn(),
   ensureRole('porteur-projet'),
   asyncHandler(async (request, response) => {
     const { action, projectId } = request.query as any

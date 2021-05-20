@@ -4,13 +4,12 @@ import { FileAccessDeniedError, FileNotFoundError } from '../../modules/file'
 import { ProjectCertificateDownloaded } from '../../modules/project/events'
 import { InfraNotAvailableError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
 v1Router.get(
   routes.DOWNLOAD_CERTIFICATE_FILE(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'porteur-projet', 'acheteur-obligé']),
   asyncHandler(async (request, response) => {
     const { projectId, fileId } = request.params

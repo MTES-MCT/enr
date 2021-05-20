@@ -8,13 +8,12 @@ import { fillDocxTemplate } from '../../helpers/fillDocxTemplate'
 import { formatDate } from '../../helpers/formatDate'
 import routes from '../../routes'
 import { getUserProject } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
 v1Router.get(
   routes.TELECHARGER_MODELE_MISE_EN_DEMEURE(),
-  ensureLoggedIn(),
   ensureRole('dreal'),
   asyncHandler(async (request, response) => {
     const { projectId } = request.params
