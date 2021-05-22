@@ -198,7 +198,8 @@ export const MakeProjectModel = (sequelize) => {
       as: 'gf',
       foreignKey: 'projectId',
       scope: {
-        [Op.and]: where(col('gf.type'), Op.eq, 'garantie-financiere'),
+        type: 'garantie-financiere',
+        [Op.or]: [{ status: ['à traiter', 'validé'] }, { status: null }],
       },
     })
 
