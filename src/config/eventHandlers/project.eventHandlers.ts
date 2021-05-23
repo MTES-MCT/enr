@@ -1,4 +1,8 @@
-import { handlePeriodeNotified } from '../../modules/project/eventHandlers'
+import { ModificationReceived } from '../../modules/modificationRequest'
+import {
+  handleModificationReceived,
+  handlePeriodeNotified,
+} from '../../modules/project/eventHandlers'
 import { PeriodeNotified } from '../../modules/project/events'
 import { eventStore } from '../eventStore.config'
 import { getUnnotifiedProjectsForPeriode } from '../queries.config'
@@ -11,6 +15,13 @@ eventStore.subscribe(
     projectRepo,
     generateCertificate,
     getUnnotifiedProjectsForPeriode,
+  })
+)
+
+eventStore.subscribe(
+  ModificationReceived.type,
+  handleModificationReceived({
+    eventBus: eventStore,
   })
 )
 
