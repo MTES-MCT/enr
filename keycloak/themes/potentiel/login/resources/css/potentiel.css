@@ -1,0 +1,239 @@
+.list--action-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--theme-border-radius);
+  padding: 5px 10px;
+  list-style: none;
+  z-index: 10000;
+  width: 250px;
+  text-align: center;
+  margin: 0;
+}
+
+.list--action-menu a {
+  text-decoration: none;
+}
+
+.list--action-menu li {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.list--action-menu li:last-child {
+  border-bottom: none;
+}
+
+.list--action-menu a:hover {
+  background-color: inherit;
+}
+
+.list--action-menu a:hover > .list--action-menu {
+  display: block;
+}
+
+.list--action-menu.open {
+  display: block;
+}
+
+.list--action-trigger {
+  width: 1.2em;
+  height: 1.2em;
+  padding: 0.2em;
+  cursor: pointer;
+  font-size: 26px;
+}
+
+.list--action-trigger:hover {
+  background-color: var(--lighter-grey);
+}
+
+/* Project List */
+
+@media only screen and (max-width: 750px) {
+  .projectList thead {
+    display: none;
+  }
+  .projectList td {
+    display: none;
+  }
+  .projectList td.projectList-projet-column {
+    display: block;
+    padding-left: var(--space-xs);
+    padding-right: 0;
+  }
+}
+
+select {
+  max-width: 100%;
+}
+
+.motif-popover {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background-color: white;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--theme-border-radius);
+  padding: 5px 10px;
+  list-style: none;
+  z-index: 10;
+  width: 400px;
+}
+
+/* Project Page  */
+
+.section--content {
+  display: none;
+  padding-bottom: 20px;
+}
+
+.open ~ .section--content {
+  display: block;
+}
+
+.section--title {
+  cursor: pointer;
+  border-bottom: 1px solid var(--grey);
+  position: relative;
+}
+
+.section--expand {
+  transform: rotate(-90deg);
+  transition: transform 300ms;
+  position: absolute;
+  right: 0px;
+  bottom: 8px;
+}
+
+.open > .section--expand {
+  transform: rotate(0deg);
+}
+
+.frise--item {
+  height: 30px;
+}
+
+.frise circle {
+  color: var(--grey);
+}
+
+.frise-content-toggle {
+  cursor: pointer;
+}
+
+.frise--item.frise--collapsed {
+  display: none;
+}
+
+.frise--toggle-show {
+  display: none;
+}
+
+.frise--item.frise--collapsed ~ tr .frise--toggle-show {
+  display: inherit;
+}
+.frise--item.frise--collapsed ~ tr .frise--toggle-hide {
+  display: none;
+}
+
+.frise .hidden {
+  display: none;
+}
+
+ul.frise:before {
+  content: '';
+  z-index: 10;
+  display: block;
+  height: 100%;
+  border-left: 2px solid var(--grey);
+  position: absolute;
+  left: 27px;
+  bottom: 0px;
+}
+
+.disabled-action {
+  text-decoration: underline;
+  color: var(--dark-grey);
+}
+
+.section-icon {
+  font-size: 20px;
+  margin-right: 10px;
+  margin-left: 5px;
+}
+
+form.invitationForm {
+  margin-left: 0px;
+  display: none;
+}
+
+.open > form.invitationForm {
+  display: block;
+}
+
+.open > .invitationFormToggle {
+  display: none;
+}
+
+/* fix template */
+a.button-outline {
+  vertical-align: bottom;
+}
+
+/* Filter toggle */
+
+.filter-toggle {
+  cursor: pointer;
+  position: relative;
+}
+
+.filter-toggle a {
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+.filter-icon {
+  transform: rotate(-90deg);
+  transition: transform 300ms;
+  margin-left: 15px;
+  vertical-align: middle;
+  top: -2px;
+}
+
+.open > .filter-icon {
+  transform: rotate(0deg);
+}
+
+.filter-panel {
+  display: none;
+  padding-bottom: 20px;
+}
+
+.periode-panel select.appelOffre {
+  width: 40%;
+}
+.periode-panel select {
+  width: 30%;
+}
+
+@media only screen and (max-width: 750px) {
+  .periode-panel select,
+  .periode-panel select.appelOffre {
+    width: 100%;
+  }
+}
+
+.open ~ .filter-panel {
+  display: block;
+}
+
+/* project list filters */
+
+.filter-panel select.active {
+  background-color: var(--theme-primary);
+  color: var(--theme-light-text);
+}
