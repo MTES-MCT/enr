@@ -2,11 +2,13 @@ import { Application, response } from 'express'
 import makeSequelizeStore from 'connect-session-sequelize'
 import session from 'express-session'
 import Keycloak from 'keycloak-connect'
+import { v4 as uuid } from 'uuid'
 import { User, USER_ROLES } from '../../entities'
 import { getUserByEmail } from '../../config'
 import { sequelizeInstance } from '../../sequelize.config'
 import { v1Router } from '../v1Router'
 import routes from '../../routes'
+import { inviteUser } from '../../infra/keycloak'
 
 const SequelizeStore = makeSequelizeStore(session.Store)
 
@@ -74,14 +76,15 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
   app.use((request, response, next) => {
     const token = request.kauth?.grant?.access_token
     const userEmail = token?.content?.email
-    if (userEmail) {
+    console.log('middleware userEmail', userEmail)
+    const kRole = token && USER_ROLES.find((role) => token.hasRealmRole(role))
+    console.log('middleware kRole', kRole)
+
+    if (userEmail && kRole) {
       return getUserByEmail(userEmail).then((userResult) => {
         if (userResult.isOk() && userResult.value !== null) {
-          const kRole = USER_ROLES.find((role) => token.hasRealmRole(role))
-          if (kRole) {
-            request.user = userResult.value
-            request.user.role = kRole
-          }
+          request.user = userResult.value
+          request.user.role = kRole
         }
         next()
       })
@@ -91,7 +94,10 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
   })
 
   v1Router.get('/test/auth', (request, response) => {
-    console.log('user', request.user)
+    inviteUser({
+      email: 'pierre@duchateau.fr',
+      role: 'porteur-projet',
+    })
 
     response.send('ok')
   })
@@ -109,7 +115,8 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
 
       if (req.kauth) {
         // This user has a session but no user was found, log him out
-        res.redirect('/logout')
+        res.send('Found kauth but not req.user')
+        // res.redirect('/logout')
         return
       }
 
