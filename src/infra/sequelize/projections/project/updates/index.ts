@@ -16,11 +16,13 @@ import {
   ProjectPuissanceUpdated,
   ProjectActionnaireUpdated,
   ProjectProducteurUpdated,
+  ProjectGFInvalidated,
 } from '../../../../../modules/project/events'
 import { onProjectCertificate } from './onProjectCertificate'
 import { onProjectDataCorrected } from './onProjectDataCorrected'
 import { onProjectDCRDueDateSet } from './onProjectDCRDueDateSet'
 import { onProjectGFDueDateSet } from './onProjectGFDueDateSet'
+import { onProjectGFInvalidated } from './onProjectGFInvalidated'
 import { onProjectCompletionDueDateSet } from './onProjectCompletionDueDateSet'
 import { onProjectNotificationDateSet } from './onProjectNotificationDateSet'
 import { onProjectClasseGranted } from './onProjectClasseGranted'
@@ -36,6 +38,7 @@ export const initProjectProjections = (eventBus: EventBus, models) => {
   eventBus.subscribe(ProjectDataCorrected.type, onProjectDataCorrected(models))
   eventBus.subscribe(ProjectDCRDueDateSet.type, onProjectDCRDueDateSet(models))
   eventBus.subscribe(ProjectGFDueDateSet.type, onProjectGFDueDateSet(models))
+  eventBus.subscribe(ProjectGFInvalidated.type, onProjectGFInvalidated(models))
   eventBus.subscribe(ProjectCompletionDueDateSet.type, onProjectCompletionDueDateSet(models))
   eventBus.subscribe(ProjectNotified.type, onProjectNotificationDateSet(models))
   eventBus.subscribe(ProjectNotificationDateSet.type, onProjectNotificationDateSet(models))
