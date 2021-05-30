@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import { logger } from '../../../../../core/utils'
 import {
   ProjectDCRRemoved,
@@ -22,6 +23,7 @@ export const onProjectStepRemoved = (models) => async (event: StepRemovedEvent) 
       where: {
         type: StepTypeByEventType[event.type],
         projectId,
+        [Op.or]: [{ status: null }, { status: 'à traiter' }],
       },
     })
   } catch (e) {

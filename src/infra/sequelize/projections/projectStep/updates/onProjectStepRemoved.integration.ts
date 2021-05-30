@@ -109,4 +109,104 @@ describe('projectStep.onProjectStepRemoved', () => {
       ).toEqual(0)
     })
   })
+
+  describe('for all events', () => {
+    describe('when existing project step status is set to "null"', () => {
+      beforeAll(async () => {
+        await resetDatabase()
+
+        await ProjectStep.create({
+          id: new UniqueEntityID().toString(),
+          projectId,
+          type: 'garantie-financiere',
+          stepDate: new Date(123),
+          fileId: new UniqueEntityID().toString(),
+          submittedBy: new UniqueEntityID().toString(),
+          submittedOn: new Date(1234),
+          status: 'invalidé',
+        })
+
+        await ProjectStep.create({
+          id: new UniqueEntityID().toString(),
+          projectId,
+          type: 'garantie-financiere',
+          stepDate: new Date(123),
+          fileId: new UniqueEntityID().toString(),
+          submittedBy: new UniqueEntityID().toString(),
+          submittedOn: new Date(1234),
+          status: null,
+        })
+
+        expect(
+          await ProjectStep.count({ where: { projectId, type: 'garantie-financiere' } })
+        ).toEqual(2)
+      })
+
+      it('should remove the project garantie-financiere step with null status only', async () => {
+        const event = new ProjectGFRemoved({
+          payload: {
+            projectId,
+            removedBy: new UniqueEntityID().toString(),
+          },
+        })
+        await onProjectStepRemoved(models)(event)
+
+        const steps = await ProjectStep.findAll({
+          where: { projectId, type: 'garantie-financiere' },
+        })
+
+        expect(steps.length).toEqual(1)
+        expect(steps[0].status).toEqual('invalidé')
+      })
+    })
+
+    describe('when existing project step status is set to "à traiter"', () => {
+      beforeAll(async () => {
+        await resetDatabase()
+
+        await ProjectStep.create({
+          id: new UniqueEntityID().toString(),
+          projectId,
+          type: 'garantie-financiere',
+          stepDate: new Date(123),
+          fileId: new UniqueEntityID().toString(),
+          submittedBy: new UniqueEntityID().toString(),
+          submittedOn: new Date(1234),
+          status: 'invalidé',
+        })
+
+        await ProjectStep.create({
+          id: new UniqueEntityID().toString(),
+          projectId,
+          type: 'garantie-financiere',
+          stepDate: new Date(123),
+          fileId: new UniqueEntityID().toString(),
+          submittedBy: new UniqueEntityID().toString(),
+          submittedOn: new Date(1234),
+          status: 'à traiter',
+        })
+
+        expect(
+          await ProjectStep.count({ where: { projectId, type: 'garantie-financiere' } })
+        ).toEqual(2)
+      })
+
+      it('should remove the project garantie-financiere step with null status only', async () => {
+        const event = new ProjectGFRemoved({
+          payload: {
+            projectId,
+            removedBy: new UniqueEntityID().toString(),
+          },
+        })
+        await onProjectStepRemoved(models)(event)
+
+        const steps = await ProjectStep.findAll({
+          where: { projectId, type: 'garantie-financiere' },
+        })
+
+        expect(steps.length).toEqual(1)
+        expect(steps[0].status).toEqual('invalidé')
+      })
+    })
+  })
 })
