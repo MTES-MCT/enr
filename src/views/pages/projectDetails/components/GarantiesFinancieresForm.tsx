@@ -10,7 +10,9 @@ export const GarantiesFinancieresForm = ({ projectId, date }: GarantiesFinancier
   <form action={ROUTES.DEPOSER_ETAPE_ACTION} method="post" encType="multipart/form-data">
     <input type="hidden" name="type" id="type" value="garantie-financiere" />
     <div className="form__group">
-      <label htmlFor="date">Date de constitution (format JJ/MM/AAAA)</label>
+      <label className="required" htmlFor="date">
+        Date de constitution (format JJ/MM/AAAA)
+      </label>
       <input
         type="text"
         name="stepDate"
@@ -33,7 +35,9 @@ export const GarantiesFinancieresForm = ({ projectId, date }: GarantiesFinancier
         Le format de la date saisie n‘est pas conforme. Elle doit être de la forme JJ/MM/AAAA soit
         par exemple 25/05/2022 pour 25 Mai 2022.
       </div>
-      <label htmlFor="file">Attestation</label>
+      <label htmlFor="file" className="required">
+        Attestation
+      </label>
       <input type="hidden" name="projectId" value={projectId} />
       <input type="file" name="file" {...dataId('file-field')} id="file" />
       <button
