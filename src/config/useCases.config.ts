@@ -31,6 +31,7 @@ import {
   getUserByEmail,
 } from './queries.config'
 import { eventStore } from './eventStore.config'
+import { createUserCredentials } from './credentials.config'
 import {
   makeAcceptModificationRequest,
   makeRejectModificationRequest,
@@ -42,8 +43,10 @@ import {
   makeCancelModificationRequest,
 } from '../modules/modificationRequest'
 import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
-import { makeInviteUser } from '../modules/users'
+import { makeInviteUser, makeInviteUserToProject } from '../modules/users'
 import { sendNotification } from './emails.config'
+import { fromOldResult, fromOldResultAsync } from '../core/utils'
+import { InfraNotAvailableError } from '../modules/shared'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
   userRepo,
@@ -154,6 +157,20 @@ export const inviteUser = makeInviteUser({
   projectAdmissionKeyRepo,
   getUserByEmail,
   sendNotification,
+})
+
+const addProjectToUser = (args: { userId: string; projectId: string }) => {
+  const { userId, projectId } = args
+  return fromOldResultAsync(userRepo.addProject(userId, projectId)).mapErr(
+    () => new InfraNotAvailableError()
+  )
+}
+
+export const inviteUserToProject = makeInviteUserToProject({
+  getUserByEmail,
+  shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
+  addProjectToUser,
+  createUserCredentials,
 })
 
 export const cancelModificationRequest = makeCancelModificationRequest({
