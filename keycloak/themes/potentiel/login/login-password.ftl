@@ -4,7 +4,6 @@
         ${msg("doLogIn")}
     <#elseif section = "form">
         <div id="kc-form">
-        PASSWORD
             <div id="kc-form-wrapper">
                 <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}"
                       method="post">
