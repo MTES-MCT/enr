@@ -158,17 +158,10 @@ export const createUser = makeCreateUser({
   eventBus: eventStore,
 })
 
-const addProjectToUser = (args: { userId: string; projectId: string }) => {
-  const { userId, projectId } = args
-  return fromOldResultAsync(userRepo.addProject(userId, projectId)).mapErr(
-    () => new InfraNotAvailableError()
-  )
-}
-
 export const inviteUserToProject = makeInviteUserToProject({
   getUserByEmail,
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
-  addProjectToUser,
+  eventBus: eventStore,
   createUser,
 })
 

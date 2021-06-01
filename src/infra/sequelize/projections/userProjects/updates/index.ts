@@ -9,3 +9,4 @@ export const initUserProjectsProjections = (eventBus: EventBus, models) => {
 
   logger.info('Initialized User Projects projections')
 }
+export * from './onUserInvitedToProject'

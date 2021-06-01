@@ -1,2 +1,3 @@
-export * from './InvitationToProjectCancelled'
-export * from './UserRightsToProjectRevoked'
+export * from './InvitationToProjectCancelled';
+export * from './UserInvitedToProject';
+export * from './UserRightsToProjectRevoked';

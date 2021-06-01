@@ -1,1 +1,1 @@
-export * from './onModificationRequested';
+export * from './onUserCreated';

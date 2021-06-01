@@ -1,9 +1,10 @@
-import { UniqueEntityID } from '../../../core/domain'
+import { DomainEvent, UniqueEntityID } from '../../../core/domain'
 import { okAsync } from '../../../core/utils'
 import { User } from '../../../entities'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import { InfraNotAvailableError } from '../../shared'
 import { makeInviteUserToProject } from './inviteUserToProject'
+import { UserInvitedToProject } from '../../authorization'
 
 describe('inviteUserToProject use-case', () => {
   const fakeUser: User = makeFakeUser()
@@ -21,15 +22,16 @@ describe('inviteUserToProject use-case', () => {
       const createUser = jest.fn((args: { role: User['role']; email: string }) =>
         okAsync<string, InfraNotAvailableError>(newUserId)
       )
-      const addProjectToUser = jest.fn((args: { userId: string; projectId: string }) =>
-        okAsync<null, InfraNotAvailableError>(null)
-      )
+      const eventBus = {
+        publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
+        subscribe: jest.fn(),
+      }
 
       const inviteUserToProject = makeInviteUserToProject({
         getUserByEmail,
         shouldUserAccessProject,
         createUser,
-        addProjectToUser,
+        eventBus,
       })
 
       beforeAll(async () => {
@@ -48,10 +50,15 @@ describe('inviteUserToProject use-case', () => {
         })
       })
 
-      it('add each project to the newly created user', () => {
-        expect(addProjectToUser).toHaveBeenCalledWith({
+      it('emit UserInvitedToProject', () => {
+        expect(eventBus.publish).toHaveBeenCalledTimes(1)
+        const event = eventBus.publish.mock.calls[0][0]
+        expect(event).toBeDefined()
+        expect(event).toBeInstanceOf(UserInvitedToProject)
+        expect(event.payload).toMatchObject({
           userId: newUserId,
-          projectId: fakeProjectId,
+          projectIds: [fakeProjectId],
+          invitedBy: fakeUser.id,
         })
       })
     })
@@ -66,11 +73,16 @@ describe('inviteUserToProject use-case', () => {
         okAsync<null, InfraNotAvailableError>(null)
       )
 
+      const eventBus = {
+        publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
+        subscribe: jest.fn(),
+      }
+
       const inviteUserToProject = makeInviteUserToProject({
         getUserByEmail,
         shouldUserAccessProject,
         createUser,
-        addProjectToUser,
+        eventBus,
       })
 
       beforeAll(async () => {
@@ -87,10 +99,15 @@ describe('inviteUserToProject use-case', () => {
         expect(createUser).not.toHaveBeenCalled()
       })
 
-      it('add each project to the existing user', () => {
-        expect(addProjectToUser).toHaveBeenCalledWith({
+      it('emit UserInvitedToProject', () => {
+        expect(eventBus.publish).toHaveBeenCalledTimes(1)
+        const event = eventBus.publish.mock.calls[0][0]
+        expect(event).toBeDefined()
+        expect(event).toBeInstanceOf(UserInvitedToProject)
+        expect(event.payload).toMatchObject({
           userId: userWithEmail.id,
-          projectId: fakeProjectId,
+          projectIds: [fakeProjectId],
+          invitedBy: fakeUser.id,
         })
       })
     })
@@ -103,13 +120,16 @@ describe('inviteUserToProject use-case', () => {
 
     const getUserByEmail = jest.fn()
     const createUser = jest.fn()
-    const addProjectToUser = jest.fn()
+    const eventBus = {
+      publish: jest.fn(),
+      subscribe: jest.fn(),
+    }
 
     const inviteUserToProject = makeInviteUserToProject({
       getUserByEmail,
       shouldUserAccessProject,
       createUser,
-      addProjectToUser,
+      eventBus,
     })
 
     it('should return UnauthorizedError', async () => {
@@ -121,7 +141,7 @@ describe('inviteUserToProject use-case', () => {
       expect(res.isErr()).toBe(true)
 
       expect(createUser).not.toHaveBeenCalled()
-      expect(addProjectToUser).not.toHaveBeenCalled()
+      expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
 })

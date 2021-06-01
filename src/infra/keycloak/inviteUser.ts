@@ -12,7 +12,7 @@ const {
   BASE_URL,
 } = process.env
 
-if (!KEYCLOAK_USER_CLIENT_ID || !KEYCLOAK_USER_CLIENT_SECRET) {
+if (!KEYCLOAK_ADMIN_CLIENT_ID || !KEYCLOAK_ADMIN_CLIENT_SECRET) {
   console.error('Missing KEYCLOAK env vars')
   process.exit(1)
 }
@@ -25,16 +25,18 @@ export const inviteUser = async ({ email, role }: InviteUserProps) => {
   try {
     await keycloakAdminClient.auth({
       grantType: 'client_credentials',
-      clientId: KEYCLOAK_USER_CLIENT_ID,
-      clientSecret: KEYCLOAK_USER_CLIENT_SECRET,
+      clientId: KEYCLOAK_ADMIN_CLIENT_ID,
+      clientSecret: KEYCLOAK_ADMIN_CLIENT_SECRET,
     })
 
-    console.log(
-      'found role',
-      await keycloakAdminClient.roles.findOneByName({
-        name: 'porteur-projet',
-      })
-    )
+    // console.log(
+    //   'found role',
+    //   await keycloakAdminClient.roles.findOneByName({
+    //     name: 'porteur-projet',
+    //   })
+    // )
+
+    // console.log('user count', await keycloakAdminClient.users.count())
     const { id } = await keycloakAdminClient.users.create({
       realm: KEYCLOAK_REALM,
       username: email,
