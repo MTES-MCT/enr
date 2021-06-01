@@ -16,14 +16,12 @@ import routes from '../../../routes'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
 import { UserWithEmailExistsAlreadyError } from '../errors'
 import { GetUserByEmail } from '../queries'
+import { makeCreateUser } from './createUser'
 
 interface InviteUserToProjectDeps {
   getUserByEmail: GetUserByEmail
   shouldUserAccessProject: (args: { user: User; projectId: Project['id'] }) => Promise<boolean>
-  createUserCredentials: (args: {
-    role: User['role']
-    email: string
-  }) => ResultAsync<string, InfraNotAvailableError>
+  createUser: ReturnType<typeof makeCreateUser>
   addProjectToUser: (args: {
     userId: string
     projectId: string
@@ -39,7 +37,7 @@ interface InviteUserToProjectArgs {
 export const makeInviteUserToProject = (deps: InviteUserToProjectDeps) => (
   args: InviteUserToProjectArgs
 ): ResultAsync<null, UnauthorizedError | InfraNotAvailableError> => {
-  const { shouldUserAccessProject, getUserByEmail, createUserCredentials, addProjectToUser } = deps
+  const { shouldUserAccessProject, getUserByEmail, createUser, addProjectToUser } = deps
   const { email, projectIds, invitedBy } = args
 
   return wrapInfra(
@@ -60,7 +58,7 @@ export const makeInviteUserToProject = (deps: InviteUserToProjectDeps) => (
     .andThen(
       (userOrNull): ResultAsync<string, InfraNotAvailableError> => {
         if (userOrNull === null) {
-          return createUserCredentials({ role: 'porteur-projet', email })
+          return createUser({ role: 'porteur-projet', email })
         }
 
         return okAsync(userOrNull.id)

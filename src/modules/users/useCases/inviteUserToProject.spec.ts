@@ -18,7 +18,7 @@ describe('inviteUserToProject use-case', () => {
       const getUserByEmail = jest.fn((email: string) =>
         okAsync<User | null, InfraNotAvailableError>(null)
       )
-      const createUserCredentials = jest.fn((args: { role: User['role']; email: string }) =>
+      const createUser = jest.fn((args: { role: User['role']; email: string }) =>
         okAsync<string, InfraNotAvailableError>(newUserId)
       )
       const addProjectToUser = jest.fn((args: { userId: string; projectId: string }) =>
@@ -28,7 +28,7 @@ describe('inviteUserToProject use-case', () => {
       const inviteUserToProject = makeInviteUserToProject({
         getUserByEmail,
         shouldUserAccessProject,
-        createUserCredentials,
+        createUser,
         addProjectToUser,
       })
 
@@ -41,8 +41,8 @@ describe('inviteUserToProject use-case', () => {
         expect(res.isOk()).toBe(true)
       })
 
-      it('should create new credentials for this email', () => {
-        expect(createUserCredentials).toHaveBeenCalledWith({
+      it('should create new user for this email', () => {
+        expect(createUser).toHaveBeenCalledWith({
           role: 'porteur-projet',
           email: fakeEmail,
         })
@@ -61,7 +61,7 @@ describe('inviteUserToProject use-case', () => {
       const getUserByEmail = jest.fn((email: string) =>
         okAsync<User | null, InfraNotAvailableError>(userWithEmail)
       )
-      const createUserCredentials = jest.fn()
+      const createUser = jest.fn()
       const addProjectToUser = jest.fn((args: { userId: string; projectId: string }) =>
         okAsync<null, InfraNotAvailableError>(null)
       )
@@ -69,7 +69,7 @@ describe('inviteUserToProject use-case', () => {
       const inviteUserToProject = makeInviteUserToProject({
         getUserByEmail,
         shouldUserAccessProject,
-        createUserCredentials,
+        createUser,
         addProjectToUser,
       })
 
@@ -82,9 +82,9 @@ describe('inviteUserToProject use-case', () => {
         expect(res.isOk()).toBe(true)
       })
 
-      it('should use the existing credentials for this email', () => {
+      it('should use the existing user for this email', () => {
         expect(getUserByEmail).toHaveBeenCalledWith(fakeEmail)
-        expect(createUserCredentials).not.toHaveBeenCalled()
+        expect(createUser).not.toHaveBeenCalled()
       })
 
       it('add each project to the existing user', () => {
@@ -102,13 +102,13 @@ describe('inviteUserToProject use-case', () => {
     )
 
     const getUserByEmail = jest.fn()
-    const createUserCredentials = jest.fn()
+    const createUser = jest.fn()
     const addProjectToUser = jest.fn()
 
     const inviteUserToProject = makeInviteUserToProject({
       getUserByEmail,
       shouldUserAccessProject,
-      createUserCredentials,
+      createUser,
       addProjectToUser,
     })
 
@@ -120,7 +120,7 @@ describe('inviteUserToProject use-case', () => {
       })
       expect(res.isErr()).toBe(true)
 
-      expect(createUserCredentials).not.toHaveBeenCalled()
+      expect(createUser).not.toHaveBeenCalled()
       expect(addProjectToUser).not.toHaveBeenCalled()
     })
   })

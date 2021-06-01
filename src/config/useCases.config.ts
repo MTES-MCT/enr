@@ -43,10 +43,11 @@ import {
   makeCancelModificationRequest,
 } from '../modules/modificationRequest'
 import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
-import { makeInviteUser, makeInviteUserToProject } from '../modules/users'
+import { makeInviteUser, makeInviteUserToProject, makeCreateUser } from '../modules/users'
 import { sendNotification } from './emails.config'
 import { fromOldResult, fromOldResultAsync } from '../core/utils'
 import { InfraNotAvailableError } from '../modules/shared'
+import { User } from '../entities'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
   userRepo,
@@ -153,6 +154,18 @@ export const importPeriodeData = makeImportPeriodeData({
   appelOffreRepo,
 })
 
+const saveUser = (user: User) => {
+  return fromOldResultAsync(userRepo.insert(user))
+    .map(() => null)
+    .mapErr(() => new InfraNotAvailableError())
+}
+
+const createUser = makeCreateUser({
+  getUserByEmail,
+  createUserCredentials,
+  saveUser,
+})
+
 export const inviteUser = makeInviteUser({
   projectAdmissionKeyRepo,
   getUserByEmail,
@@ -170,7 +183,7 @@ export const inviteUserToProject = makeInviteUserToProject({
   getUserByEmail,
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
   addProjectToUser,
-  createUserCredentials,
+  createUser,
 })
 
 export const cancelModificationRequest = makeCancelModificationRequest({
