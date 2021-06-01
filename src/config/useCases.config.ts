@@ -152,16 +152,10 @@ export const importPeriodeData = makeImportPeriodeData({
   appelOffreRepo,
 })
 
-const saveUser = (user: User) => {
-  return fromOldResultAsync(userRepo.insert(user))
-    .map(() => null)
-    .mapErr(() => new InfraNotAvailableError())
-}
-
 export const createUser = makeCreateUser({
   getUserByEmail,
   createUserCredentials,
-  saveUser,
+  eventBus: eventStore,
 })
 
 const addProjectToUser = (args: { userId: string; projectId: string }) => {

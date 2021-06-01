@@ -1,10 +1,11 @@
-import { UniqueEntityID } from '../../../core/domain'
+import { DomainEvent, UniqueEntityID } from '../../../core/domain'
 import { okAsync } from '../../../core/utils'
 import { User } from '../../../entities'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
 import { UserWithEmailExistsAlreadyError } from '../errors'
 import { makeCreateUser } from './createUser'
+import { UserCreated } from '../events'
 
 describe('createUser use-case', () => {
   const fakeEmail = 'test@test.test'
@@ -17,12 +18,15 @@ describe('createUser use-case', () => {
     const createUserCredentials = jest.fn((args: { role: User['role']; email: string }) =>
       okAsync<string, InfraNotAvailableError>(newUserId)
     )
-    const saveUser = jest.fn((user: User) => okAsync<null, InfraNotAvailableError>(null))
+    const eventBus = {
+      publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
+      subscribe: jest.fn(),
+    }
 
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
-      saveUser,
+      eventBus,
     })
 
     beforeAll(async () => {
@@ -41,12 +45,13 @@ describe('createUser use-case', () => {
       })
     })
 
-    it('create and save a new user', () => {
-      expect(saveUser).toHaveBeenCalled()
-      const newUser = saveUser.mock.calls[0][0]
-      expect(newUser).toBeDefined()
-      expect(newUser.id).toEqual(newUserId)
-      expect(newUser.role).toEqual('porteur-projet')
+    it('emit UserCreated', () => {
+      expect(eventBus.publish).toHaveBeenCalled()
+      const event = eventBus.publish.mock.calls[0][0]
+      expect(event).toBeDefined()
+      expect(event).toBeInstanceOf(UserCreated)
+      expect(event.payload.userId).toEqual(newUserId)
+      expect(event.payload.role).toEqual('porteur-projet')
     })
   })
 
@@ -56,12 +61,16 @@ describe('createUser use-case', () => {
       okAsync<User | null, InfraNotAvailableError>(userWithEmail)
     )
     const createUserCredentials = jest.fn()
-    const saveUser = jest.fn()
+
+    const eventBus = {
+      publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
+      subscribe: jest.fn(),
+    }
 
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
-      saveUser,
+      eventBus,
     })
 
     it('should return UserWithEmailExistsAlreadyError', async () => {
@@ -73,7 +82,7 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrapErr()).toBeInstanceOf(UserWithEmailExistsAlreadyError)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
-      expect(saveUser).not.toHaveBeenCalled()
+      expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
 
@@ -81,11 +90,15 @@ describe('createUser use-case', () => {
     const getUserByEmail = jest.fn()
     const createUserCredentials = jest.fn()
     const saveUser = jest.fn()
+    const eventBus = {
+      publish: jest.fn(),
+      subscribe: jest.fn(),
+    }
 
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
-      saveUser,
+      eventBus,
     })
 
     it('should return UnauthorizedError', async () => {
@@ -97,19 +110,22 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrapErr()).toBeInstanceOf(UnauthorizedError)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
-      expect(saveUser).not.toHaveBeenCalled()
+      expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
 
   describe('when new user role is dgec', () => {
     const getUserByEmail = jest.fn()
     const createUserCredentials = jest.fn()
-    const saveUser = jest.fn()
+    const eventBus = {
+      publish: jest.fn(),
+      subscribe: jest.fn(),
+    }
 
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
-      saveUser,
+      eventBus,
     })
 
     it('should return UnauthorizedError', async () => {
@@ -121,7 +137,7 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrapErr()).toBeInstanceOf(UnauthorizedError)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
-      expect(saveUser).not.toHaveBeenCalled()
+      expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
 

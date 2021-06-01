@@ -1,7 +1,9 @@
 import { errAsync, ResultAsync } from '../../../core/utils'
 import { User } from '../../../entities'
+import { EventBus } from '../../eventStore'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
 import { UserWithEmailExistsAlreadyError } from '../errors'
+import { UserCreated } from '../events'
 import { GetUserByEmail } from '../queries'
 
 interface CreateUserDeps {
@@ -10,7 +12,7 @@ interface CreateUserDeps {
     role: User['role']
     email: string
   }) => ResultAsync<string, InfraNotAvailableError>
-  saveUser: (user: User) => ResultAsync<null, InfraNotAvailableError>
+  eventBus: EventBus
 }
 
 interface CreateUserArgs {
@@ -24,7 +26,7 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
   string,
   UnauthorizedError | InfraNotAvailableError | UserWithEmailExistsAlreadyError
 > => {
-  const { getUserByEmail, createUserCredentials, saveUser } = deps
+  const { getUserByEmail, createUserCredentials, eventBus } = deps
   const { email, role } = args
 
   if (role === 'admin' || role === 'dgec') {
@@ -41,5 +43,7 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
         return createUserCredentials({ role: 'porteur-projet', email })
       }
     )
-    .andThen((userId) => saveUser({ id: userId, fullName: '', email, role }).map(() => userId))
+    .andThen((userId) =>
+      eventBus.publish(new UserCreated({ payload: { userId, email, role } })).map(() => userId)
+    )
 }

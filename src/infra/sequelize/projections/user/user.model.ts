@@ -1,4 +1,7 @@
 import { DataTypes } from 'sequelize'
+import { makeProjector } from '../../helpers'
+
+export const userProjector = makeProjector()
 
 export const MakeUserModel = (sequelize) => {
   const User = sequelize.define(
@@ -24,6 +27,10 @@ export const MakeUserModel = (sequelize) => {
         type: DataTypes.UUID,
         allowNull: true,
       },
+      registeredOn: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
@@ -33,6 +40,8 @@ export const MakeUserModel = (sequelize) => {
   User.associate = (models) => {
     // Add belongsTo etc. statements here
   }
+
+  User.projector = userProjector
 
   return User
 }
