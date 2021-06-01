@@ -9,6 +9,7 @@ export interface UserCreatedPayload {
   email: string
   role: string
   fullName?: string
+  createdBy?: string
 }
 export class UserCreated extends BaseDomainEvent<UserCreatedPayload> implements DomainEvent {
   public static type: 'UserCreated' = 'UserCreated'

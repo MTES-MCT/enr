@@ -23,6 +23,7 @@ v1Router.post(
       await createUser({
         email: email.toLowerCase(),
         role,
+        createdBy: request.user,
       })
     ).match(
       () =>

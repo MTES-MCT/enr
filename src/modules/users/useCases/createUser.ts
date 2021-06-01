@@ -18,6 +18,7 @@ interface CreateUserDeps {
 interface CreateUserArgs {
   email: string
   role: User['role']
+  createdBy?: User
 }
 
 export const makeCreateUser = (deps: CreateUserDeps) => (
@@ -27,7 +28,7 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
   UnauthorizedError | InfraNotAvailableError | UserWithEmailExistsAlreadyError
 > => {
   const { getUserByEmail, createUserCredentials, eventBus } = deps
-  const { email, role } = args
+  const { email, role, createdBy } = args
 
   if (role === 'admin' || role === 'dgec') {
     return errAsync(new UnauthorizedError())
@@ -44,6 +45,8 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
       }
     )
     .andThen((userId) =>
-      eventBus.publish(new UserCreated({ payload: { userId, email, role } })).map(() => userId)
+      eventBus
+        .publish(new UserCreated({ payload: { userId, email, role, createdBy: createdBy?.id } }))
+        .map(() => userId)
     )
 }
