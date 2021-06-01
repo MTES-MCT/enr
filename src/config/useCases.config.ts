@@ -1,53 +1,51 @@
+import { fromOldResultAsync } from '../core/utils'
+import { User } from '../entities'
+import { makeImportAppelOffreData, makeImportPeriodeData } from '../modules/appelOffre/useCases'
 import {
   BaseShouldUserAccessProject,
-  makeRevokeRightsToProject,
   makeCancelInvitationToProject,
+  makeRevokeRightsToProject,
 } from '../modules/authorization'
 import { makeLoadFileForUser } from '../modules/file'
 import {
+  makeAcceptModificationRequest,
+  makeCancelModificationRequest,
+  makeConfirmRequest,
+  makeRejectModificationRequest,
+  makeRequestActionnaireModification,
+  makeRequestConfirmation,
+  makeRequestPuissanceModification,
+  makeUpdateModificationRequestStatus,
+} from '../modules/modificationRequest'
+import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
+import {
   makeCorrectProjectData,
   makeGenerateCertificate,
-  makeSubmitStep,
-  makeRemoveStep,
   makeRegenerateCertificatesForPeriode,
+  makeRemoveStep,
+  makeSubmitStep,
   makeUpdateStepStatus,
 } from '../modules/project/useCases'
-import { makeImportAppelOffreData, makeImportPeriodeData } from '../modules/appelOffre/useCases'
+import { InfraNotAvailableError } from '../modules/shared'
+import { makeCreateUser, makeInviteUserToProject } from '../modules/users'
 import { buildCertificate } from '../views/certificates'
+import { createUserCredentials } from './credentials.config'
+import { eventStore } from './eventStore.config'
 import {
-  fileRepo,
-  oldProjectRepo,
-  projectRepo,
-  userRepo,
-  modificationRequestRepo,
-  appelOffreRepo,
-  projectAdmissionKeyRepo,
-} from './repos.config'
-import {
+  getAppelOffreList,
   getFileProject,
   getProjectIdForAdmissionKey,
   getProjectIdsForPeriode,
-  getAppelOffreList,
   getUserByEmail,
 } from './queries.config'
-import { eventStore } from './eventStore.config'
-import { createUserCredentials } from './credentials.config'
 import {
-  makeAcceptModificationRequest,
-  makeRejectModificationRequest,
-  makeRequestPuissanceModification,
-  makeRequestActionnaireModification,
-  makeUpdateModificationRequestStatus,
-  makeRequestConfirmation,
-  makeConfirmRequest,
-  makeCancelModificationRequest,
-} from '../modules/modificationRequest'
-import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
-import { makeInviteUser, makeInviteUserToProject, makeCreateUser } from '../modules/users'
-import { sendNotification } from './emails.config'
-import { fromOldResult, fromOldResultAsync } from '../core/utils'
-import { InfraNotAvailableError } from '../modules/shared'
-import { User } from '../entities'
+  appelOffreRepo,
+  fileRepo,
+  modificationRequestRepo,
+  oldProjectRepo,
+  projectRepo,
+  userRepo,
+} from './repos.config'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
   userRepo,
@@ -160,16 +158,10 @@ const saveUser = (user: User) => {
     .mapErr(() => new InfraNotAvailableError())
 }
 
-const createUser = makeCreateUser({
+export const createUser = makeCreateUser({
   getUserByEmail,
   createUserCredentials,
   saveUser,
-})
-
-export const inviteUser = makeInviteUser({
-  projectAdmissionKeyRepo,
-  getUserByEmail,
-  sendNotification,
 })
 
 const addProjectToUser = (args: { userId: string; projectId: string }) => {

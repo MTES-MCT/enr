@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import { inviteUser } from '../../config'
+import { createUser } from '../../config'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
 import { ensureRole } from '../auth'
@@ -10,7 +10,6 @@ v1Router.post(
   ensureRole('admin'),
   asyncHandler(async (request, response) => {
     const { email, role } = request.body
-    const { user } = request
 
     if (!['acheteur-obligé'].includes(role)) {
       return response.redirect(
@@ -21,10 +20,9 @@ v1Router.post(
     }
 
     ;(
-      await inviteUser({
+      await createUser({
         email: email.toLowerCase(),
-        forRole: role,
-        invitedBy: user,
+        role,
       })
     ).match(
       () =>

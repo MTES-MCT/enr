@@ -1,20 +1,6 @@
-import {
-  combine,
-  err,
-  errAsync,
-  fromOldResult,
-  logger,
-  okAsync,
-  Result,
-  ResultAsync,
-  combineWithAllErrors,
-  wrapInfra,
-  ok,
-} from '../../../core/utils'
-import { makeProjectAdmissionKey, Project, ProjectAdmissionKey, User } from '../../../entities'
-import routes from '../../../routes'
+import { combine, err, ok, okAsync, Result, ResultAsync, wrapInfra } from '../../../core/utils'
+import { Project, User } from '../../../entities'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
-import { UserWithEmailExistsAlreadyError } from '../errors'
 import { GetUserByEmail } from '../queries'
 import { makeCreateUser } from './createUser'
 
