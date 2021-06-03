@@ -9,6 +9,7 @@ import { sequelizeInstance } from '../../sequelize.config'
 import { v1Router } from '../v1Router'
 import routes from '../../routes'
 import { inviteUser } from '../../infra/keycloak'
+import { logger } from '../../core/utils'
 
 const SequelizeStore = makeSequelizeStore(session.Store)
 
@@ -74,17 +75,20 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
 
   // Add a middleware to attach the User object on the request (if logged-in)
   app.use((request, response, next) => {
+    // @ts-ignore
     const token = request.kauth?.grant?.access_token
     const userEmail = token?.content?.email
-    console.log('middleware userEmail', userEmail)
     const kRole = token && USER_ROLES.find((role) => token.hasRealmRole(role))
-    console.log('middleware kRole', kRole)
 
     if (userEmail && kRole) {
       return getUserByEmail(userEmail).then((userResult) => {
         if (userResult.isOk() && userResult.value !== null) {
           request.user = userResult.value
           request.user.role = kRole
+        } else {
+          logger.error(
+            new Error(`Keycloak session open but could not find user in db with email ${userEmail}`)
+          )
         }
         next()
       })
@@ -106,15 +110,17 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
     res.redirect(routes.REDIRECT_BASED_ON_ROLE)
   })
 
-  v1Router.get(routes.REDIRECT_BASED_ON_ROLE, async (req, res) => {
+  v1Router.get(routes.REDIRECT_BASED_ON_ROLE, keycloak.protect(), async (req, res) => {
     const user = req.user as User
 
     if (!user) {
       // Sometimes, the user session is not immediately available in the req object
       // In that case, wait a bit and redirect to the same url
 
-      if (req.kauth) {
+      // @ts-ignore
+      if (req.kauth && Object.keys(req.kauth).length) {
         // This user has a session but no user was found, log him out
+        console.log(req.kauth)
         res.send('Found kauth but not req.user')
         // res.redirect('/logout')
         return
@@ -148,3 +154,5 @@ export const ensureRole = (roles: User['role'] | User['role'][]) => {
     return roleList.some((role) => token.hasRealmRole(role))
   })
 }
+
+export const ensureLoggedIn = keycloak.protect.bind(keycloak)
