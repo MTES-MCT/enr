@@ -30,6 +30,7 @@ class routes {
   static LOGIN_ACTION = '/login'
   static LOGOUT_ACTION = '/logout'
   static FORGOTTEN_PASSWORD = '/mot-de-passe-oublie.html'
+  static REGISTRATION_CALLBACK = '/bienvenue-sur-potentiel'
   static FORGOTTEN_PASSWORD_ACTION = '/retrieve-password'
   static RESET_PASSWORD_LINK = withParams<{
     resetCode: string

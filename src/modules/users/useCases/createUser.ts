@@ -41,7 +41,7 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
           return errAsync(new UserWithEmailExistsAlreadyError())
         }
 
-        return createUserCredentials({ role: 'porteur-projet', email })
+        return createUserCredentials({ role, email })
       }
     )
     .andThen((userId) =>

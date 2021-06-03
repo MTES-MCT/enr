@@ -7,5 +7,5 @@ export const onUserCreated = userProjector
     id: userId,
     email,
     role,
-    fullName,
+    fullName: fullName || '',
   }))

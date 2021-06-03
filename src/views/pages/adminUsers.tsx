@@ -56,7 +56,7 @@ export default function AdminUsers({ request, users, invitations }: AdminUsersPr
             </div>
           </form>
         </div>
-        {users?.length && (
+        {Boolean(users?.length) && (
           <>
             <h5>Liste des utilisateurs</h5>
             <table className="table" {...dataId('projectList-list')}>
@@ -81,7 +81,7 @@ export default function AdminUsers({ request, users, invitations }: AdminUsersPr
             </table>
           </>
         )}
-        {invitations?.length && (
+        {Boolean(invitations?.length) && (
           <>
             <h5>Les utilisateurs invités</h5>
             <table className="table" {...dataId('projectList-list')}>
