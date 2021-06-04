@@ -4,6 +4,16 @@
         ${msg("updatePasswordTitle")}
     <#elseif section = "form">
         <form id="kc-passwd-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+            <h3>Merci de choisir un mot de passe</h3>
+            <#if messagesPerField.existsError('password-confirm')>
+                <div class="notification error">${kcSanitize(messagesPerField.get('password-confirm'))?no_esc}</div>
+            </#if>
+            <#if messagesPerField.existsError('password')>
+                <div class="notification error">${kcSanitize(messagesPerField.get('password'))?no_esc}</div>
+            </#if>
+            <#if message?has_content && message.type == 'error'>
+                <div class="notification error">${kcSanitize(message.summary)?no_esc}</div>
+            </#if>
             <input type="text" id="username" name="username" value="${username}" autocomplete="username"
                    readonly="readonly" style="display:none;"/>
             <input type="password" id="password" name="password" autocomplete="current-password" style="display:none;"/>
@@ -18,11 +28,7 @@
                            aria-invalid="<#if messagesPerField.existsError('password','password-confirm')>true</#if>"
                     />
 
-                    <#if messagesPerField.existsError('password')>
-                        <span id="input-error-password" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('password'))?no_esc}
-                        </span>
-                    </#if>
+                    
                 </div>
             </div>
 
@@ -37,11 +43,7 @@
                            aria-invalid="<#if messagesPerField.existsError('password-confirm')>true</#if>"
                     />
 
-                    <#if messagesPerField.existsError('password-confirm')>
-                        <span id="input-error-password-confirm" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('password-confirm'))?no_esc}
-                        </span>
-                    </#if>
+                    
 
                 </div>
             </div>
