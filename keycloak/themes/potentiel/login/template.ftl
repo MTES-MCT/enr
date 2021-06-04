@@ -130,7 +130,7 @@
     </svg>
 <header class="navbar" role="navigation"><div class="navbar__container"><a class="navbar__home" href="/"><img class="navbar__logo" src="${url.resourcesPath}/img/logo-marianne.svg" alt="potentiel.beta.gouv.fr"/><span class="navbar__domain">potentiel.<b>beta.gouv</b><i>.fr</i></span></a><nav></nav></div></header><main role="main"><section class="section section-grey"><div class="container">
 
-<#nested "header">
+<#--  <#nested "header">  -->
 <#nested "form">
 
 </div></section></main><footer class="footer" role="contentinfo"><div class="container"><ul class="footer__links"><li><img style="max-width:100%" src="${url.resourcesPath}/img/MIN_Transition_Ecologique_RVB_petit.png" alt="Logo du ministère de la transition énergétique" width="300" height="215"/></li><li><a href="https://docs.potentiel.beta.gouv.fr/info/cgu">Mentions Légales et Conditions Générales d‘Utilisation</a></li><li><a href="https://docs.potentiel.beta.gouv.fr/info/guide-dutilisation-potentiel">Guide d‘utilisation</a></li><li><a href="https://docs.potentiel.beta.gouv.fr/info/cgu#cookies">Notre politique de cookies</a></li></ul><div>2.34.0</div></div></footer>

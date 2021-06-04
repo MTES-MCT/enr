@@ -28,13 +28,12 @@ export const createUserCredentials = (args: { role: User['role']; email: string 
       username: email,
       enabled: true,
       email,
-      // requiredActions: [RequiredActionAlias.UPDATE_PASSWORD],
     })
 
     await keycloakAdminClient.users.executeActionsEmail({
       id,
       clientId: KEYCLOAK_USER_CLIENT_ID,
-      actions: [RequiredActionAlias.UPDATE_PASSWORD, RequiredActionAlias.VERIFY_EMAIL],
+      actions: [RequiredActionAlias.UPDATE_PASSWORD, RequiredActionAlias.UPDATE_PROFILE],
       realm: KEYCLOAK_REALM,
       redirectUri: BASE_URL + routes.REGISTRATION_CALLBACK,
     })

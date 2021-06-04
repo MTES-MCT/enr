@@ -97,15 +97,6 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
     next()
   })
 
-  v1Router.get('/test/auth', (request, response) => {
-    inviteUser({
-      email: 'pierre@duchateau.fr',
-      role: 'porteur-projet',
-    })
-
-    response.send('ok')
-  })
-
   v1Router.get(routes.LOGIN, keycloak.protect(), (req, res) => {
     res.redirect(routes.REDIRECT_BASED_ON_ROLE)
   })
@@ -120,7 +111,6 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
       // @ts-ignore
       if (req.kauth && Object.keys(req.kauth).length) {
         // This user has a session but no user was found, log him out
-        console.log(req.kauth)
         res.send('Found kauth but not req.user')
         // res.redirect('/logout')
         return

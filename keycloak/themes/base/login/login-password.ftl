@@ -1,8 +1,6 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('password'); section>
-    <#if section = "header">
-        ${msg("doLogIn")}
-    <#elseif section = "form">
+    <#if section = "form">
         <div id="kc-form">
             <div id="kc-form-wrapper">
                 <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}"

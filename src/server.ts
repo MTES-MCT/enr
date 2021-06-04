@@ -1,6 +1,6 @@
 import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
-import express from 'express'
+import express, { Request } from 'express'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import { version } from '../package.json'
@@ -33,7 +33,16 @@ export async function makeServer(port: number, sessionSecret: string) {
       )
     }
 
-    app.use(morgan('tiny'))
+    app.use(
+      morgan('tiny', {
+        skip: (req: Request, res) =>
+          req.path.startsWith('/fonts') ||
+          req.path.startsWith('/images') ||
+          req.path.startsWith('/scripts') ||
+          req.path.startsWith('/main') ||
+          req.path === '/',
+      })
+    )
 
     app.use(
       express.urlencoded({
