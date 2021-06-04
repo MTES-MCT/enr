@@ -10,6 +10,9 @@
     <div id="kc-info-message">
         <h3>Bienvenue sur Potentiel !</h3>
         <p class="instruction">${message.summary}<#if requiredActions??><#list requiredActions>: <ul><#items as reqActionItem><li>${msg("requiredAction.${reqActionItem}")}</li><#sep></#items></ul></#list><#else></#if></p>
+        <#if message.summary == msg("accountUpdatedMessage")>
+            <a class="button" href="${properties.potentielUrl}/go-to-user-dashboard">Me connecter à Potentiel</a>
+        </#if>
         <#if skipLink??>
         <#else>
             <#if pageRedirectUri?has_content>
