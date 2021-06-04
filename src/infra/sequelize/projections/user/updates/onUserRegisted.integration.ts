@@ -13,6 +13,7 @@ describeProjector(onUserRegistered)
     new UserRegistered({
       payload: {
         userId,
+        fullName: 'John Doe',
       },
       original: {
         version: 1,
@@ -24,13 +25,13 @@ describeProjector(onUserRegistered)
     model: User,
     id: userId,
     before: {
-      fullName: 'fullname',
+      fullName: '',
       email: 'test@test.test',
       role: 'porteur-projet',
       registeredOn: null,
     },
     after: {
-      fullName: 'fullname',
+      fullName: 'John Doe',
       email: 'test@test.test',
       role: 'porteur-projet',
       registeredOn: new Date(123),

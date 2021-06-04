@@ -6,6 +6,7 @@ import { BaseDomainEvent, DomainEvent } from '../../../core/domain/DomainEvent'
 
 export interface UserRegisteredPayload {
   userId: string
+  fullName: string
 }
 export class UserRegistered extends BaseDomainEvent<UserRegisteredPayload> implements DomainEvent {
   public static type: 'UserRegistered' = 'UserRegistered'
