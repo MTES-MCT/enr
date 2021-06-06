@@ -47,7 +47,9 @@ export const ProjectFrise = ({ project, user, request }: ProjectFriseProps) => (
                 // garanties financières déjà déposées
                 <FriseItem
                   date={formatDate(project.garantiesFinancieres.gfDate, 'D MMM YYYY')}
-                  title="Constitution des garanties financières"
+                  title={`Constitution des garanties financières (${
+                    project.garantiesFinancieres.gfStatus || 'à traiter'
+                  })`}
                   action={[
                     {
                       title: "Télécharger l'attestation",

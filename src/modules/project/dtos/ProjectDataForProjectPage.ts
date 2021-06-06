@@ -122,6 +122,7 @@ type GFSubmitted = {
     id: string
     filename: string
   }
+  gfStatus: string
 }
 
 type GFPending = {

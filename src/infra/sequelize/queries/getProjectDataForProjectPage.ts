@@ -199,12 +199,14 @@ export const makeGetProjectDataForProjectPage = (models): GetProjectDataForProje
     }
 
     if (gf) {
-      const { submittedOn, file, stepDate } = gf
+      const { submittedOn, status, file, stepDate } = gf
+
       result.garantiesFinancieres = {
         ...result.garantiesFinancieres,
         submittedOn,
         file: file?.get(),
         gfDate: stepDate,
+        gfStatus: status,
       }
     }
 
