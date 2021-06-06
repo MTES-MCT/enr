@@ -29,6 +29,7 @@ import {
   getProjectIdsForPeriode,
   getAppelOffreList,
   getUserByEmail,
+  getProjectStepStatus,
 } from './queries.config'
 import { eventStore } from './eventStore.config'
 import {
@@ -110,6 +111,8 @@ export const submitStep = makeSubmitStep({
 
 export const removeStep = makeRemoveStep({
   eventBus: eventStore,
+  projectRepo,
+  getProjectStepStatus,
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
 })
 

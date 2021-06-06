@@ -13,7 +13,7 @@ v1Router.get(
   ensureRole(['admin', 'dgec', 'porteur-projet']),
   asyncHandler(async (request, response) => {
     const { user } = request
-    const { projectId, type } = request.params
+    const { projectId, projectStepId, type } = request.params
 
     if (!projectId || !['ptf', 'dcr', 'garantie-financiere'].includes(type)) {
       return response.status(400).send('Requête erronnée')
@@ -23,6 +23,7 @@ v1Router.get(
       await removeStep({
         removedBy: user,
         projectId,
+        projectStepId,
         type: asLiteral(type),
       })
     ).match(

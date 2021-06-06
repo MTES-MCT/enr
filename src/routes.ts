@@ -208,11 +208,18 @@ class routes {
   static INVITE_USER_TO_PROJECT_ACTION = '/invite-user-to-project'
 
   static DEPOSER_ETAPE_ACTION = '/deposer-etape'
-  static SUPPRIMER_ETAPE_ACTION = (args?: { projectId: string; type: string }) => {
-    const route = '/projet/:projectId/supprimer/:type'
+  static SUPPRIMER_ETAPE_ACTION = (args?: {
+    projectId: string
+    projectStepId: string
+    type: string
+  }) => {
+    const route = '/projet/:projectId/etape-projet/:projectStepId/supprimer/:type'
     if (args) {
-      const { type, projectId } = args
-      return route.replace(':projectId', projectId).replace(':type', type)
+      const { type, projectId, projectStepId } = args
+      return route
+        .replace(':projectId', projectId)
+        .replace(':type', type)
+        .replace(':etape-projet', projectStepId)
     } else return route
   }
 

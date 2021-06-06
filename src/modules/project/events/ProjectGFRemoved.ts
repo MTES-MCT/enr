@@ -2,6 +2,7 @@ import { BaseDomainEvent, DomainEvent } from '../../../core/domain/DomainEvent'
 
 export interface ProjectGFRemovedPayload {
   projectId: string
+  projectStepId: string
   removedBy: string
 }
 export class ProjectGFRemoved
