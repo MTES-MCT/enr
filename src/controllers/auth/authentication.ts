@@ -111,8 +111,11 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
       // @ts-ignore
       if (req.kauth && Object.keys(req.kauth).length) {
         // This user has a session but no user was found, log him out
-        res.send('Found kauth but not req.user')
-        // res.redirect('/logout')
+        // res.send('Found kauth but not req.user')
+        logger.error(
+          `Found user keycloak auth but not user in database for id ${req.kauth?.grant?.access_token?.content?.sub}`
+        )
+        res.redirect('/logout')
         return
       }
 
