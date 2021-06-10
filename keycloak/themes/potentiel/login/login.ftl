@@ -7,6 +7,15 @@
       <div id="kc-form-wrapper">
         <#if realm.password>
             <form id="kc-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}" method="post">
+                <#if message?has_content>
+                    <#if message.type == 'error'>
+                    <div class="notification error">${kcSanitize(message.summary)?no_esc}</div>
+                    <#elseif message.type == 'warning'>
+                    <div class="notification warning">${kcSanitize(message.summary)?no_esc}</div>
+                    <#else>
+                    <div class="notification success">${kcSanitize(message.summary)?no_esc}</div>
+                    </#if>
+                </#if>
                 <div class="${properties.kcFormGroupClass!} form__group">
                     <label for="username" class="${properties.kcLabelClass!}">Courrier électronique</label>
 
@@ -60,8 +69,6 @@
             </form>
         </#if>
         </div>
-
-        
 
     </div>
     <#elseif section = "info" >
