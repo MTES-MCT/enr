@@ -14,6 +14,6 @@ export class UserRegistered extends BaseDomainEvent<UserRegisteredPayload> imple
   currentVersion = 1
 
   aggregateIdFromPayload(payload: UserRegisteredPayload) {
-    return undefined
+    return payload.userId
   }
 }

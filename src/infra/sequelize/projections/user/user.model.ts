@@ -31,6 +31,10 @@ export const MakeUserModel = (sequelize) => {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      keycloakId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+      },
     },
     {
       timestamps: true,
