@@ -1,9 +1,10 @@
 'use strict';
 
 const uuid = require('uuid')
-const { RequiredActionAlias, default: KeycloakAdmin } = require('keycloak-admin')
+const { RequiredActionAlias, default: KeycloakAdmin } = require('keycloak-admin');
 
 const {
+  NODE_ENV,
   BASE_URL,
   KEYCLOAK_SERVER,
   KEYCLOAK_REALM,
@@ -13,25 +14,34 @@ const {
   KEYCLOAK_USER_CLIENT_SECRET,
 } = process.env
 
-if (
-  !KEYCLOAK_SERVER ||
-  !KEYCLOAK_REALM ||
-  !KEYCLOAK_ADMIN_CLIENT_ID ||
-  !KEYCLOAK_ADMIN_CLIENT_SECRET ||
-  !KEYCLOAK_USER_CLIENT_ID ||
-  !KEYCLOAK_USER_CLIENT_SECRET
-) {
-  console.error('Missing KEYCLOAK env vars')
-  process.exit(1)
+if(NODE_ENV !== 'test'){
+  if (
+    !KEYCLOAK_SERVER ||
+    !KEYCLOAK_REALM ||
+    !KEYCLOAK_ADMIN_CLIENT_ID ||
+    !KEYCLOAK_ADMIN_CLIENT_SECRET ||
+    !KEYCLOAK_USER_CLIENT_ID ||
+    !KEYCLOAK_USER_CLIENT_SECRET
+  ) {
+    console.error('Missing KEYCLOAK env vars')
+    process.exit(1)
+  }
 }
 
-const keycloakAdminClient = new KeycloakAdmin({
-  baseUrl: KEYCLOAK_SERVER,
-  realmName: KEYCLOAK_REALM,
-})
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+
+    if(NODE_ENV === "test"){
+      console.log('test environnement => skipping')
+      return
+    }
+
+    const keycloakAdminClient = new KeycloakAdmin({
+      baseUrl: KEYCLOAK_SERVER,
+      realmName: KEYCLOAK_REALM,
+    })
+
     const transaction = await queryInterface.sequelize.transaction()
     try{
 
