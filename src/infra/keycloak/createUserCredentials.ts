@@ -13,6 +13,8 @@ const {
   BASE_URL,
 } = process.env
 
+const ONE_MONTH = 3600 * 24 * 30
+
 export const createUserCredentials = (args: { role: User['role']; email: string }) => {
   const { email, role } = args
 
@@ -36,6 +38,7 @@ export const createUserCredentials = (args: { role: User['role']; email: string 
       actions: [RequiredActionAlias.UPDATE_PASSWORD, RequiredActionAlias.UPDATE_PROFILE],
       realm: KEYCLOAK_REALM,
       redirectUri: BASE_URL + routes.REGISTRATION_CALLBACK,
+      lifespan: ONE_MONTH,
     })
 
     const realmRole = await keycloakAdminClient.roles.findOneByName({ name: role })
