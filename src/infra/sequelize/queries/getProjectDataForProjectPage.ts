@@ -1,6 +1,5 @@
 import { err, errAsync, ok, wrapInfra } from '../../../core/utils'
 import { getAppelOffre } from '../../../dataAccess/inMemory'
-import { ProjectDataForProjectPage } from '../../../modules/project/dtos'
 import { GetProjectDataForProjectPage } from '../../../modules/project/queries/GetProjectDataForProjectPage'
 import { EntityNotFoundError, InfraNotAvailableError } from '../../../modules/shared'
 
@@ -8,8 +7,8 @@ export const makeGetProjectDataForProjectPage = (models): GetProjectDataForProje
   projectId,
   user,
 }) => {
-  const { Project, File, User, UserProjects, ProjectAdmissionKey, ProjectStep } = models
-  if (!Project || !File || !User || !UserProjects || !ProjectAdmissionKey || !ProjectStep)
+  const { Project, File, User, UserProjects, ProjectStep } = models
+  if (!Project || !File || !User || !UserProjects || !ProjectStep)
     return errAsync(new InfraNotAvailableError())
 
   return wrapInfra(
@@ -28,29 +27,9 @@ export const makeGetProjectDataForProjectPage = (models): GetProjectDataForProje
           include: [
             {
               model: User,
-              attributes: ['id', 'fullName', 'email'],
+              attributes: ['id', 'fullName', 'email', 'registeredOn'],
             },
           ],
-        },
-        {
-          model: ProjectAdmissionKey,
-          as: 'invitations',
-          where: {
-            cancelled: false,
-            lastUsedAt: 0,
-          },
-          attributes: ['id', 'email'],
-          required: false,
-        },
-        {
-          model: ProjectAdmissionKey,
-          as: 'invitationsForProjectEmail',
-          where: {
-            cancelled: false,
-            lastUsedAt: 0,
-          },
-          attributes: ['id', 'email'],
-          required: false,
         },
         {
           model: ProjectStep,
@@ -126,23 +105,12 @@ export const makeGetProjectDataForProjectPage = (models): GetProjectDataForProje
       garantiesFinancieresDueOn,
       dcrDueOn,
       users,
-      invitations,
-      invitationsForProjectEmail,
       gf,
       dcr,
       ptf,
       completionDueOn,
       updatedAt,
     } = projectRaw.get()
-
-    let allInvitations: any[] = []
-    if (invitations) {
-      allInvitations = [...allInvitations, ...invitations.map((item) => item.get())]
-    }
-
-    if (invitationsForProjectEmail) {
-      allInvitations = [...allInvitations, ...invitationsForProjectEmail.map((item) => item.get())]
-    }
 
     const result: any = {
       id,
@@ -174,8 +142,14 @@ export const makeGetProjectDataForProjectPage = (models): GetProjectDataForProje
       isClasse: classe === 'Classé',
       isAbandoned: abandonedOn !== 0,
       motifsElimination,
-      users: users?.map(({ user }) => user),
-      invitations: allInvitations,
+      users: users
+        ?.map(({ user }) => user.get())
+        .map(({ id, email, fullName, registeredOn }) => ({
+          id,
+          email,
+          fullName,
+          isRegistered: !!registeredOn,
+        })),
       garantiesFinancieres: undefined,
       updatedAt,
     }
