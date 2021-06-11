@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler'
-import { createUser } from '../../config'
+import { createUser, eventStore } from '../../config'
 import { addQueryParams } from '../../helpers/addQueryParams'
+import { PartnerUserInvited } from '../../modules/authorization/events/PartnerUserInvited'
 import routes from '../../routes'
 import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
@@ -24,7 +25,17 @@ v1Router.post(
         email: email.toLowerCase(),
         role,
         createdBy: request.user,
-      })
+      }).andThen((userId) =>
+        eventStore.publish(
+          new PartnerUserInvited({
+            payload: {
+              userId,
+              role,
+              invitedBy: request.user.id,
+            },
+          })
+        )
+      )
     ).match(
       () =>
         response.redirect(
