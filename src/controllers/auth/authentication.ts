@@ -4,7 +4,7 @@ import session from 'express-session'
 import Keycloak from 'keycloak-connect'
 import { v4 as uuid } from 'uuid'
 import { User, USER_ROLES } from '../../entities'
-import { getUserByEmail } from '../../config'
+import { getUserByEmail, registerFirstUserLogin } from '../../config'
 import { sequelizeInstance } from '../../sequelize.config'
 import { v1Router } from '../v1Router'
 import routes from '../../routes'
@@ -75,6 +75,19 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
 
   // Add a middleware to attach the User object on the request (if logged-in)
   app.use((request, response, next) => {
+    if (
+      // Theses paths should be prefixed with /static in the future
+      request.path.startsWith('/fonts') ||
+      request.path.startsWith('/css') ||
+      request.path.startsWith('/images') ||
+      request.path.startsWith('/scripts') ||
+      request.path.startsWith('/main') ||
+      request.path === '/'
+    ) {
+      next()
+      return
+    }
+
     // @ts-ignore
     const token = request.kauth?.grant?.access_token
     const userEmail = token?.content?.email
@@ -85,6 +98,9 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
         if (userResult.isOk() && userResult.value !== null) {
           request.user = userResult.value
           request.user.role = kRole
+          if (!request.user.isRegistered) {
+            registerFirstUserLogin({ userId: userResult.value.id, fullName: '' })
+          }
         } else {
           logger.error(
             new Error(`Keycloak session open but could not find user in db with email ${userEmail}`)

@@ -12,6 +12,7 @@ const deserialize = (item) => ({
   ...item,
   projectAdmissionKey: item.projectAdmissionKey || undefined,
   fullName: item.fullName || '',
+  isRegistered: !!item.registeredOn,
 })
 const serialize = (item) => item
 

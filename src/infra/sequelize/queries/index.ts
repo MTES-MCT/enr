@@ -1,5 +1,5 @@
 import models from '../models'
-import { userRepo } from '../../../config/repos.config'
+import { oldUserRepo } from '../../../config/repos.config'
 import { makeGetUnnotifiedProjectsForPeriode } from './getUnnotifiedProjectsForPeriode'
 import { makeGetModificationRequestDetails } from './getModificationRequestDetails'
 import { makeGetModificationRequestStatus } from './getModificationRequestStatus'
@@ -50,7 +50,7 @@ export const getModificationRequestDataForResponseTemplate = makeGetModification
   {
     models,
     getPeriode,
-    findDrealsForUser: userRepo['findDrealsForUser'],
+    findDrealsForUser: oldUserRepo['findDrealsForUser'],
     dgecEmail: process.env.DGEC_EMAIL || '',
   }
 )

@@ -26,8 +26,11 @@ import {
   makeSubmitStep,
   makeUpdateStepStatus,
 } from '../modules/project/useCases'
-import { InfraNotAvailableError } from '../modules/shared'
-import { makeCreateUser, makeInviteUserToProject } from '../modules/users'
+import {
+  makeCreateUser,
+  makeInviteUserToProject,
+  makeRegisterFirstUserLogin,
+} from '../modules/users'
 import { buildCertificate } from '../views/certificates'
 import { createUserCredentials } from './credentials.config'
 import { eventStore } from './eventStore.config'
@@ -43,12 +46,13 @@ import {
   fileRepo,
   modificationRequestRepo,
   oldProjectRepo,
+  oldUserRepo,
   projectRepo,
   userRepo,
 } from './repos.config'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
-  userRepo,
+  oldUserRepo,
   oldProjectRepo.findById
 )
 
@@ -163,6 +167,10 @@ export const inviteUserToProject = makeInviteUserToProject({
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
   eventBus: eventStore,
   createUser,
+})
+
+export const registerFirstUserLogin = makeRegisterFirstUserLogin({
+  userRepo,
 })
 
 export const cancelModificationRequest = makeCancelModificationRequest({

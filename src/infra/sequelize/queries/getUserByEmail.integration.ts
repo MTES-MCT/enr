@@ -21,6 +21,7 @@ describe('Sequelize getUserByEmail', () => {
         fullName: 'John Doe',
         email: 'test@test.test',
         role: 'porteur-projet',
+        registeredOn: new Date(123),
       },
     ])
   })
@@ -34,6 +35,7 @@ describe('Sequelize getUserByEmail', () => {
         fullName: 'John Doe',
         email: 'test@test.test',
         role: 'porteur-projet',
+        isRegistered: true,
       })
     })
   })

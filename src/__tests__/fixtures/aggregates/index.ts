@@ -5,3 +5,4 @@ export * from './makeFakeAppelOffre';
 export * from './makeFakeCandidateNotification';
 export * from './makeFakeModificationRequest';
 export * from './makeFakeProject';
+export * from './makeFakeUser';

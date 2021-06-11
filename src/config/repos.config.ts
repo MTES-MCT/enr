@@ -1,6 +1,6 @@
 export * from '../infra/sequelize/repos'
 export {
-  userRepo,
+  userRepo as oldUserRepo,
   projectRepo as oldProjectRepo,
   projectAdmissionKeyRepo as oldProjectAdmissionKeyRepo,
 } from '../dataAccess'

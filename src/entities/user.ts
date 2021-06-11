@@ -1,5 +1,5 @@
 import isEmail from 'isemail'
-import { String, Record, Union, Literal, Partial, Static } from '../types/schemaTypes'
+import { String, Record, Union, Literal, Partial, Static, Boolean } from '../types/schemaTypes'
 import buildMakeEntity from '../helpers/buildMakeEntity'
 
 export const USER_ROLES = [
@@ -23,6 +23,7 @@ const baseUserSchema = Record({
     Literal('acheteur-obligé'),
     Literal('ademe')
   ),
+  isRegistered: Boolean,
 })
 
 const userSchema = baseUserSchema.And(
