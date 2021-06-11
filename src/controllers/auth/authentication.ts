@@ -1,4 +1,4 @@
-import { Application, response } from 'express'
+import { Application, request, response, Router } from 'express'
 import makeSequelizeStore from 'connect-session-sequelize'
 import session from 'express-session'
 import Keycloak from 'keycloak-connect'
@@ -10,6 +10,7 @@ import { v1Router } from '../v1Router'
 import routes from '../../routes'
 import { inviteUser } from '../../infra/keycloak'
 import { logger } from '../../core/utils'
+import QueryString from 'querystring'
 
 const SequelizeStore = makeSequelizeStore(session.Store)
 
@@ -147,12 +148,15 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
       return
     }
 
+    // @ts-ignore
+    const queryString = QueryString.stringify(req.query)
+
     if (['admin', 'dgec', 'dreal'].includes(user.role)) {
-      res.redirect(routes.ADMIN_DASHBOARD)
+      res.redirect(routes.ADMIN_DASHBOARD + '?' + queryString)
       return
     }
 
-    res.redirect(routes.USER_DASHBOARD)
+    res.redirect(routes.USER_DASHBOARD + '?' + queryString)
   })
 }
 
