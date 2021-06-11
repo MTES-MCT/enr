@@ -1,7 +1,7 @@
 'use strict';
 
 const uuid = require('uuid')
-const { RequiredActionAlias, default: KeycloakAdmin } = require('keycloak-admin');
+const { requiredAction, default: KeycloakAdmin } = require('keycloak-admin');
 
 const {
   NODE_ENV,
@@ -72,7 +72,7 @@ module.exports = {
           email,
           emailVerified: true,
           lastName: fullName,
-          requiredActions: [RequiredActionAlias.UPDATE_PASSWORD],
+          requiredActions: [requiredAction.UPDATE_PASSWORD],
         })
 
         const realmRole = await keycloakAdminClient.roles.findOneByName({ name: role })
@@ -87,13 +87,14 @@ module.exports = {
           // console.log(`Keycloak added role ${role} to user ${email}`)
         }
 
-        // TODO: send update link
-        await keycloakAdminClient.users.sendVerifyEmail({
-          id,
-          clientId: KEYCLOAK_USER_CLIENT_ID,
-          realm: KEYCLOAK_REALM,
-          redirectUri: BASE_URL + '/go-to-user-dashboard'
-        })
+        if(NODE_ENV === 'production'){
+          await keycloakAdminClient.users.sendVerifyEmail({
+            id: keycloakId,
+            clientId: KEYCLOAK_USER_CLIENT_ID,
+            realm: KEYCLOAK_REALM,
+            redirectUri: BASE_URL + '/go-to-user-dashboard'
+          })
+        }
 
         await queryInterface.bulkInsert(
           'eventStores',
