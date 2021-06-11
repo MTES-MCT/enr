@@ -1,1 +1,1 @@
-export { createUserCredentials } from '../infra/keycloak'
+export { createUserCredentials, getUserName } from '../infra/keycloak'

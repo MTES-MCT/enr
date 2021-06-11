@@ -100,7 +100,7 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
           request.user = userResult.value
           request.user.role = kRole
           if (!request.user.isRegistered) {
-            registerFirstUserLogin({ userId: userResult.value.id, fullName: '' })
+            registerFirstUserLogin({ userId: userResult.value.id, keycloakId: token?.content?.sub })
           }
         } else {
           logger.error(
