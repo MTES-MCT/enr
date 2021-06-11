@@ -9,9 +9,10 @@ v1Router.post(
   routes.INVITE_USER_TO_PROJECT_ACTION,
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet']),
   asyncHandler(async (request, response) => {
-    const { email, projectId: projectIds } = request.body
+    const { email, projectId } = request.body
     const { user } = request
 
+    const projectIds = Array.isArray(projectId) ? projectId : [projectId]
     const redirectTo = Array.isArray(projectIds)
       ? routes.REDIRECT_BASED_ON_ROLE
       : routes.PROJECT_DETAILS(projectIds[0])
