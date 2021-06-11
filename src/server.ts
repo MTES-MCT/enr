@@ -37,6 +37,7 @@ export async function makeServer(port: number, sessionSecret: string) {
       morgan('tiny', {
         skip: (req: Request, res) =>
           req.path.startsWith('/fonts') ||
+          req.path.startsWith('/css') ||
           req.path.startsWith('/images') ||
           req.path.startsWith('/scripts') ||
           req.path.startsWith('/main') ||
@@ -56,8 +57,9 @@ export async function makeServer(port: number, sessionSecret: string) {
 
     registerAuth({ app, sessionSecret })
 
-    app.use(express.static('src/public'))
     app.use(v1Router)
+
+    app.use(express.static('src/public'))
 
     if (process.env.NODE_ENV === 'test') {
       app.use(testRouter)
