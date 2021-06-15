@@ -3,9 +3,8 @@ import { okAsync } from '../../../core/utils'
 import { User } from '../../../entities'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
-import { UserWithEmailExistsAlreadyError } from '../errors'
-import { makeCreateUser } from './createUser'
 import { UserCreated } from '../events'
+import { makeCreateUser } from './createUser'
 
 describe('createUser use-case', () => {
   const fakeEmail = 'test@test.test'
@@ -73,13 +72,13 @@ describe('createUser use-case', () => {
       eventBus,
     })
 
-    it('should return UserWithEmailExistsAlreadyError', async () => {
+    it('should return the existing user id', async () => {
       const res = await createUser({
         email: fakeEmail,
         role: 'porteur-projet',
       })
-      expect(res.isErr()).toBe(true)
-      expect(res._unsafeUnwrapErr()).toBeInstanceOf(UserWithEmailExistsAlreadyError)
+      expect(res.isOk()).toBe(true)
+      expect(res._unsafeUnwrap()).toEqual(userWithEmail.id)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
       expect(eventBus.publish).not.toHaveBeenCalled()
@@ -140,6 +139,4 @@ describe('createUser use-case', () => {
       expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
-
-  // describe('when trying to create an admin user')
 })
