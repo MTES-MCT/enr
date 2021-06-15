@@ -151,10 +151,6 @@ class routes {
   static ADMIN_NOTIFY_CANDIDATES_ACTION = '/admin/sendCandidateNotifications'
   static ADMIN_CORRECT_PROJECT_DATA_ACTION = '/admin/correctProjectData'
   static ADMIN_REPLY_TO_MODIFICATION_REQUEST = '/admin/replyToModificationRequest'
-  static ADMIN_INVITE_DREAL_ACTION = '/admin/inviteDreal'
-  static DREAL_INVITATION = withParams<{
-    projectAdmissionKey: string
-  }>('/enregistrement.html')
 
   static ADMIN_DREAL_LIST = '/admin/dreals.html'
   static ADMIN_INVITATION_LIST = '/admin/invitations.html'

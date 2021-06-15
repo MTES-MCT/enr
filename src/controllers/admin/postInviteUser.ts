@@ -1,6 +1,8 @@
 import asyncHandler from 'express-async-handler'
 import { createUser, eventStore } from '../../config'
+import { REGIONS } from '../../entities'
 import { addQueryParams } from '../../helpers/addQueryParams'
+import { DrealUserInvited } from '../../modules/authorization'
 import { PartnerUserInvited } from '../../modules/authorization/events/PartnerUserInvited'
 import routes from '../../routes'
 import { ensureRole } from '../auth'
@@ -10,12 +12,22 @@ v1Router.post(
   routes.ADMIN_INVITE_USER_ACTION,
   ensureRole('admin'),
   asyncHandler(async (request, response) => {
-    const { email, role } = request.body
+    const { email, role, region } = request.body
 
-    if (!['acheteur-obligé'].includes(role)) {
+    const redirectTo = request.get('Referrer')
+
+    if (!['acheteur-obligé', 'dreal'].includes(role)) {
       return response.redirect(
-        addQueryParams(routes.ADMIN_USERS, {
+        addQueryParams(redirectTo, {
           error: 'Le role attendu n‘est pas reconnu.',
+        })
+      )
+    }
+
+    if (role === 'dreal' && !REGIONS.includes(region)) {
+      return response.redirect(
+        addQueryParams(redirectTo, {
+          error: 'Cette DREAL n‘est pas reconnue.',
         })
       )
     }
@@ -25,8 +37,20 @@ v1Router.post(
         email: email.toLowerCase(),
         role,
         createdBy: request.user,
-      }).andThen((userId) =>
-        eventStore.publish(
+      }).andThen((userId) => {
+        if (role === 'dreal') {
+          return eventStore.publish(
+            new DrealUserInvited({
+              payload: {
+                userId,
+                region,
+                invitedBy: request.user.id,
+              },
+            })
+          )
+        }
+
+        return eventStore.publish(
           new PartnerUserInvited({
             payload: {
               userId,
@@ -35,17 +59,17 @@ v1Router.post(
             },
           })
         )
-      )
+      })
     ).match(
       () =>
         response.redirect(
-          addQueryParams(routes.ADMIN_USERS, {
+          addQueryParams(redirectTo, {
             success: `Une invitation a bien été envoyée à ${email}`,
           })
         ),
       (error: Error) =>
         response.redirect(
-          addQueryParams(routes.ADMIN_USERS, {
+          addQueryParams(redirectTo, {
             error: error.message,
           })
         )

@@ -12,6 +12,7 @@ import { MakeProjectAdmissionKeyModel } from './projections/projectAdmissionKey/
 import { MakeModificationRequestModel } from './projections/modificationRequest/modificationRequest.model'
 import { MakeAppelOffreModel } from './projections/appelOffre/appelOffre.model'
 import { MakePeriodeModel } from './projections/appelOffre/periode.model'
+import { MakeUserDrealModel } from './projections/userDreal/userDreal.model'
 import { EventBus } from '../../modules/eventStore'
 
 const models = {
@@ -26,6 +27,7 @@ const models = {
   ProjectStep: MakeProjectStepModel(sequelizeInstance),
   AppelOffre: MakeAppelOffreModel(sequelizeInstance),
   Periode: MakePeriodeModel(sequelizeInstance),
+  UserDreal: MakeUserDrealModel(sequelizeInstance),
 }
 
 // Link projectors with the eventBus (called by the application config)
