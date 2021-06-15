@@ -9,12 +9,15 @@ import AdminDashboard from '../components/adminDashboard'
 interface DREALListProps {
   request: Request
   users: Array<{ user: User; dreals: Array<DREAL> }>
-  invitations: Array<ProjectAdmissionKey>
 }
 
 /* Pure component */
-export default function DREALList({ request, users, invitations }: DREALListProps) {
+export default function DREALList({ request, users }: DREALListProps) {
   const { error, success } = (request.query as any) || {}
+
+  const currentDrealUsers = users.filter(({ user }) => !!user.isRegistered)
+  const invitations = users.filter(({ user }) => !user.isRegistered)
+
   return (
     <AdminDashboard role={request.user?.role} currentPage="list-dreal">
       <div className="panel">
@@ -39,12 +42,13 @@ export default function DREALList({ request, users, invitations }: DREALListProp
             ''
           )}
           <form
-            action={ROUTES.ADMIN_INVITE_DREAL_ACTION}
+            action={ROUTES.ADMIN_INVITE_USER_ACTION}
             method="post"
             style={{ maxWidth: 'auto', margin: '0 0 15px 0' }}
           >
             <div className="form__group">
               <label htmlFor="email">Adresse email</label>
+              <input type="hidden" name="role" value="dreal" />
               <input
                 type="text"
                 name="email"
@@ -73,7 +77,7 @@ export default function DREALList({ request, users, invitations }: DREALListProp
             </div>
           </form>
         </div>
-        {users && users.length ? (
+        {currentDrealUsers && currentDrealUsers.length ? (
           <>
             <h5>Les utilisateurs rattachés à une DREAL</h5>
             <table className="table" {...dataId('projectList-list')}>
@@ -84,7 +88,7 @@ export default function DREALList({ request, users, invitations }: DREALListProp
                 </tr>
               </thead>
               <tbody>
-                {users.map(({ user, dreals }) => {
+                {currentDrealUsers.map(({ user, dreals }) => {
                   return (
                     <tr key={'user_' + user.id} {...dataId('drealList-item')}>
                       <td valign="top">
@@ -107,21 +111,15 @@ export default function DREALList({ request, users, invitations }: DREALListProp
               <thead>
                 <tr>
                   <th>Utilisateur</th>
-                  <th>DREAL</th>
-                  <th>Date</th>
+                  <th>DREAL(s)</th>
                 </tr>
               </thead>
               <tbody>
-                {invitations.map((invitation) => {
+                {invitations.map(({ user, dreals }) => {
                   return (
-                    <tr key={'invitation_' + invitation.id} {...dataId('invitationList-item')}>
-                      <td valign="top">{invitation.email}</td>
-                      <td valign="top">{invitation.dreal}</td>
-                      <td valign="top">
-                        {invitation.createdAt
-                          ? formatDate(invitation.createdAt, 'DD/MM/YYYY à HH:mm')
-                          : ''}
-                      </td>
+                    <tr key={'user_' + user.id} {...dataId('drealList-item')}>
+                      <td valign="top">{user.email}</td>
+                      <td valign="top">{dreals.join(', ')}</td>
                     </tr>
                   )
                 })}

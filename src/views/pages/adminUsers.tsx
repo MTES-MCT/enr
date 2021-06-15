@@ -11,12 +11,15 @@ import { SuccessErrorBox } from '../components'
 interface AdminUsersProps {
   request: Request
   users: Array<User>
-  invitations: Array<ProjectAdmissionKey>
 }
 
 /* Pure component */
-export default function AdminUsers({ request, users, invitations }: AdminUsersProps) {
+export default function AdminUsers({ request, users }: AdminUsersProps) {
   const { error, success } = (request.query as any) || {}
+
+  const registeredUsers = users.filter((user) => !!user.isRegistered)
+  const invitations = users.filter((user) => !user.isRegistered)
+
   return (
     <AdminDashboard role={request.user?.role} currentPage="admin-users">
       <div className="panel">
@@ -56,7 +59,7 @@ export default function AdminUsers({ request, users, invitations }: AdminUsersPr
             </div>
           </form>
         </div>
-        {Boolean(users?.length) && (
+        {Boolean(registeredUsers?.length) && (
           <>
             <h5>Liste des utilisateurs</h5>
             <table className="table" {...dataId('projectList-list')}>
@@ -67,7 +70,7 @@ export default function AdminUsers({ request, users, invitations }: AdminUsersPr
                 </tr>
               </thead>
               <tbody>
-                {users.map(({ id, fullName, email, role }) => {
+                {registeredUsers.map(({ id, fullName, email, role }) => {
                   return (
                     <tr key={'user_' + id} {...dataId('userList-item')}>
                       <td valign="top">
@@ -89,22 +92,14 @@ export default function AdminUsers({ request, users, invitations }: AdminUsersPr
                 <tr>
                   <th>Utilisateur</th>
                   <th>Role</th>
-                  <th>Date</th>
-                  <th>Invitation</th>
                 </tr>
               </thead>
               <tbody>
-                {invitations.map(({ id, email, forRole, createdAt }) => {
+                {invitations.map(({ id, email, role }) => {
                   return (
-                    <tr key={'invitation_' + id} {...dataId('invitationList-item')}>
+                    <tr key={'user_' + id} {...dataId('userList-item')}>
                       <td valign="top">{email}</td>
-                      <td valign="top">{forRole}</td>
-                      <td valign="top">
-                        {createdAt ? formatDate(createdAt, 'DD/MM/YYYY à HH:mm') : ''}
-                      </td>
-                      <td>
-                        <a href={routes.USER_INVITATION({ projectAdmissionKey: id })}>lien</a>
-                      </td>
+                      <td valign="top">{role}</td>
                     </tr>
                   )
                 })}

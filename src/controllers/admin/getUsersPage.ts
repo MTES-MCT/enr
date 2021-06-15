@@ -11,12 +11,6 @@ v1Router.get(
   asyncHandler(async (request, response) => {
     const users = await userRepo.findAll({ role: ['acheteur-obligé', 'ademe'] })
 
-    // Get all invitations for dreals
-    const invitations = await projectAdmissionKeyRepo.findAll({
-      forRole: -1,
-      lastUsedAt: 0,
-    })
-
-    return response.send(AdminUsersPage({ request, users, invitations }))
+    return response.send(AdminUsersPage({ request, users }))
   })
 )

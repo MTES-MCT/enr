@@ -38,6 +38,14 @@ export default function makeUserRepo({ sequelizeInstance }): UserRepo {
       type: DataTypes.UUID,
       allowNull: true,
     },
+    registeredOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    keycloakId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
   })
 
   const UserDrealModel = sequelizeInstance.define('userDreal', {
@@ -171,7 +179,7 @@ export default function makeUserRepo({ sequelizeInstance }): UserRepo {
         'User.findAll.deserialize error'
       )
 
-      return mapIfOk(deserializedItems, makeUser, 'User.findAll.makeUser error')
+      return deserializedItems
     } catch (error) {
       if (CONFIG.logDbErrors) logger.error(error)
       return []

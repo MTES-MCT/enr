@@ -11,6 +11,7 @@ v1Router.get(
   asyncHandler(async (request, response) => {
     // Get all dreal users
     const drealUsers = await userRepo.findAll({ role: 'dreal' })
+
     const users = await Promise.all(
       drealUsers.map(async (user) => {
         const dreals = await userRepo.findDrealsForUser(user.id)
@@ -18,12 +19,6 @@ v1Router.get(
       })
     )
 
-    // Get all invitations for dreals
-    const invitations = await projectAdmissionKeyRepo.findAll({
-      dreal: -1,
-      lastUsedAt: 0,
-    })
-
-    return response.send(DrealListPage({ request, users, invitations }))
+    return response.send(DrealListPage({ request, users }))
   })
 )
