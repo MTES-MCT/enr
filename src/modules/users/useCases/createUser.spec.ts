@@ -5,18 +5,24 @@ import makeFakeUser from '../../../__tests__/fixtures/user'
 import { InfraNotAvailableError, UnauthorizedError } from '../../shared'
 import { UserCreated } from '../events'
 import { makeCreateUser } from './createUser'
+import { UserProjectsLinkedByContactEmail } from '../../authorization'
 
 describe('createUser use-case', () => {
   const fakeEmail = 'test@test.test'
 
   describe('when invited email is not an existing user', () => {
     const newUserId = new UniqueEntityID().toString()
+    const projectWithSameEmailId = new UniqueEntityID().toString()
     const getUserByEmail = jest.fn((email: string) =>
       okAsync<User | null, InfraNotAvailableError>(null)
     )
     const createUserCredentials = jest.fn((args: { role: User['role']; email: string }) =>
       okAsync<string, InfraNotAvailableError>(newUserId)
     )
+    const getProjectsByContactEmail = jest.fn((email: string) =>
+      okAsync<string[], InfraNotAvailableError>([projectWithSameEmailId])
+    )
+
     const eventBus = {
       publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
       subscribe: jest.fn(),
@@ -25,6 +31,7 @@ describe('createUser use-case', () => {
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
+      getProjectsByContactEmail,
       eventBus,
     })
 
@@ -46,11 +53,25 @@ describe('createUser use-case', () => {
 
     it('emit UserCreated', () => {
       expect(eventBus.publish).toHaveBeenCalled()
-      const event = eventBus.publish.mock.calls[0][0]
-      expect(event).toBeDefined()
-      expect(event).toBeInstanceOf(UserCreated)
-      expect(event.payload.userId).toEqual(newUserId)
-      expect(event.payload.role).toEqual('porteur-projet')
+      const userCreatedEvents = eventBus.publish.mock.calls
+        .filter((call) => call[0].type === 'UserCreated')
+        .map((call) => call[0] as UserCreated)
+
+      expect(userCreatedEvents).toHaveLength(1)
+      expect(userCreatedEvents[0].payload.userId).toEqual(newUserId)
+      expect(userCreatedEvents[0].payload.role).toEqual('porteur-projet')
+    })
+
+    it('should give rights to all existing projects with this email', () => {
+      const userProjectLinkedEvents = eventBus.publish.mock.calls
+        .filter((call) => call[0].type === 'UserProjectsLinkedByContactEmail')
+        .map((call) => call[0] as UserProjectsLinkedByContactEmail)
+
+      expect(userProjectLinkedEvents).toHaveLength(1)
+      expect(userProjectLinkedEvents[0].payload).toMatchObject({
+        userId: newUserId,
+        projectIds: [projectWithSameEmailId],
+      })
     })
   })
 
@@ -60,6 +81,7 @@ describe('createUser use-case', () => {
       okAsync<User | null, InfraNotAvailableError>(userWithEmail)
     )
     const createUserCredentials = jest.fn()
+    const getProjectsByContactEmail = jest.fn()
 
     const eventBus = {
       publish: jest.fn((event: DomainEvent) => okAsync<null, InfraNotAvailableError>(null)),
@@ -69,6 +91,7 @@ describe('createUser use-case', () => {
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
+      getProjectsByContactEmail,
       eventBus,
     })
 
@@ -81,6 +104,7 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrap()).toEqual(userWithEmail.id)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
+      expect(getProjectsByContactEmail).not.toHaveBeenCalled()
       expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
@@ -88,7 +112,7 @@ describe('createUser use-case', () => {
   describe('when new user role is admin', () => {
     const getUserByEmail = jest.fn()
     const createUserCredentials = jest.fn()
-    const saveUser = jest.fn()
+    const getProjectsByContactEmail = jest.fn()
     const eventBus = {
       publish: jest.fn(),
       subscribe: jest.fn(),
@@ -97,6 +121,7 @@ describe('createUser use-case', () => {
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
+      getProjectsByContactEmail,
       eventBus,
     })
 
@@ -109,6 +134,7 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrapErr()).toBeInstanceOf(UnauthorizedError)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
+      expect(getProjectsByContactEmail).not.toHaveBeenCalled()
       expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
@@ -116,6 +142,7 @@ describe('createUser use-case', () => {
   describe('when new user role is dgec', () => {
     const getUserByEmail = jest.fn()
     const createUserCredentials = jest.fn()
+    const getProjectsByContactEmail = jest.fn()
     const eventBus = {
       publish: jest.fn(),
       subscribe: jest.fn(),
@@ -124,6 +151,7 @@ describe('createUser use-case', () => {
     const createUser = makeCreateUser({
       getUserByEmail,
       createUserCredentials,
+      getProjectsByContactEmail,
       eventBus,
     })
 
@@ -136,6 +164,7 @@ describe('createUser use-case', () => {
       expect(res._unsafeUnwrapErr()).toBeInstanceOf(UnauthorizedError)
 
       expect(createUserCredentials).not.toHaveBeenCalled()
+      expect(getProjectsByContactEmail).not.toHaveBeenCalled()
       expect(eventBus.publish).not.toHaveBeenCalled()
     })
   })
