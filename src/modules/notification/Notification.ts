@@ -18,7 +18,6 @@ type BaseNotification = {
 type Designation = {
   type: 'designation'
   context: {
-    projectAdmissionKeyId: string
     appelOffreId: string
     periodeId: string
   }
