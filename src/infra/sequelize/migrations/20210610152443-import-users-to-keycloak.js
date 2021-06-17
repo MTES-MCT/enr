@@ -32,8 +32,8 @@ if(NODE_ENV !== 'test'){
 module.exports = {
   up: async (queryInterface, Sequelize) => {
 
-    if(NODE_ENV === "test"){
-      console.log('test environnement => skipping')
+    if(NODE_ENV === "test" || NODE_ENV === "development"){
+      console.log('test/dev environnement => skipping')
       return
     }
 
