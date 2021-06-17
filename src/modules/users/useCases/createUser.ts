@@ -14,6 +14,7 @@ interface CreateUserDeps {
   createUserCredentials: (args: {
     role: User['role']
     email: string
+    fullName?: string
   }) => ResultAsync<string, InfraNotAvailableError>
   eventBus: EventBus
 }
@@ -41,7 +42,7 @@ export const makeCreateUser = (deps: CreateUserDeps) => (
         return okAsync(userOrNull.id)
       }
 
-      return createUserCredentials({ role, email })
+      return createUserCredentials({ role, email, fullName })
         .andThen((userId) =>
           eventBus
             .publish(

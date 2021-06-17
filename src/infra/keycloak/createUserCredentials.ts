@@ -29,26 +29,34 @@ export const createUserCredentials = (args: {
       clientSecret: KEYCLOAK_ADMIN_CLIENT_SECRET,
     })
 
-    const { id } = await keycloakAdminClient.users.create({
-      realm: KEYCLOAK_REALM,
-      username: email,
-      lastName: fullName,
-      enabled: true,
-      email,
-    })
+    const usersWithEmail = await keycloakAdminClient.users.find({ email, realm: KEYCLOAK_REALM })
 
-    const actions = [RequiredActionAlias.UPDATE_PASSWORD]
+    let id = usersWithEmail.length ? usersWithEmail[0].id : undefined
 
-    if (!fullName) actions.push(RequiredActionAlias.UPDATE_PROFILE)
+    if (!id) {
+      const newUser = await keycloakAdminClient.users.create({
+        realm: KEYCLOAK_REALM,
+        username: email,
+        lastName: fullName,
+        enabled: true,
+        email,
+      })
 
-    await keycloakAdminClient.users.executeActionsEmail({
-      id,
-      clientId: KEYCLOAK_USER_CLIENT_ID,
-      actions,
-      realm: KEYCLOAK_REALM,
-      redirectUri: BASE_URL + routes.REGISTRATION_CALLBACK,
-      lifespan: ONE_MONTH,
-    })
+      id = newUser.id
+
+      const actions = [RequiredActionAlias.UPDATE_PASSWORD]
+
+      if (!fullName) actions.push(RequiredActionAlias.UPDATE_PROFILE)
+
+      await keycloakAdminClient.users.executeActionsEmail({
+        id,
+        clientId: KEYCLOAK_USER_CLIENT_ID,
+        actions,
+        realm: KEYCLOAK_REALM,
+        redirectUri: BASE_URL + routes.REGISTRATION_CALLBACK,
+        lifespan: ONE_MONTH,
+      })
+    }
 
     const realmRole = await keycloakAdminClient.roles.findOneByName({ name: role })
     if (!realmRole || !realmRole.id) {

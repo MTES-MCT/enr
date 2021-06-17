@@ -1,16 +1,14 @@
-import { Application, request, response, Router } from 'express'
 import makeSequelizeStore from 'connect-session-sequelize'
+import { Application } from 'express'
 import session from 'express-session'
 import Keycloak from 'keycloak-connect'
-import { v4 as uuid } from 'uuid'
-import { User, USER_ROLES } from '../../entities'
+import QueryString from 'querystring'
 import { getUserByEmail, registerFirstUserLogin } from '../../config'
+import { logger } from '../../core/utils'
+import { User, USER_ROLES } from '../../entities'
+import routes from '../../routes'
 import { sequelizeInstance } from '../../sequelize.config'
 import { v1Router } from '../v1Router'
-import routes from '../../routes'
-import { inviteUser } from '../../infra/keycloak'
-import { logger } from '../../core/utils'
-import QueryString from 'querystring'
 
 const SequelizeStore = makeSequelizeStore(session.Store)
 
@@ -99,6 +97,7 @@ export const registerAuth = ({ app, sessionSecret }: RegisterAuthProps) => {
         if (userResult.isOk() && userResult.value !== null) {
           request.user = userResult.value
           request.user.role = kRole
+
           if (!request.user.isRegistered) {
             registerFirstUserLogin({ userId: userResult.value.id, keycloakId: token?.content?.sub })
           }
