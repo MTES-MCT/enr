@@ -6,8 +6,7 @@ import asyncHandler from 'express-async-handler'
 
 v1Router.get(
   routes.IMPORT_PROJECTS,
-
-  // ensureRole(['admin', 'dgec']),
+  ensureRole(['admin', 'dgec']),
   asyncHandler(async (request, response) => {
     return response.send(
       ImportCandidatesPage({
