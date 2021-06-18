@@ -29,9 +29,8 @@ type Designation = {
 type ProjectInvitation = {
   type: 'project-invitation'
   context: {
-    projectAdmissionKeyId?: string
     userId?: string
-    projectId: string
+    projectIds: string[]
   }
   variables: {
     invitation_link: string
