@@ -1,11 +1,10 @@
 import { eventStore, fileRepo, sendNotification } from '../config'
-import { appelOffreRepo, projectAdmissionKeyRepo, projectRepo, userRepo } from '../dataAccess'
+import { appelOffreRepo, projectRepo, userRepo } from '../dataAccess'
 import makeGetUserProject from './getUserProject'
 import makeImportProjects from './importProjects'
 import makeListProjects from './listProjects'
 import makeListUnnotifiedProjects from './listUnnotifiedProjects'
 import makeRelanceGarantiesFinancieres from './relanceGarantiesFinancieres'
-import makeRelanceInvitations from './relanceInvitations'
 import makeRequestModification from './requestModification'
 import makeShouldUserAccessProject from './shouldUserAccessProject'
 
@@ -55,11 +54,6 @@ const getUserProject = makeGetUserProject({
   shouldUserAccessProject,
 })
 
-const relanceInvitations = makeRelanceInvitations({
-  projectAdmissionKeyRepo,
-  sendNotification,
-})
-
 const relanceGarantiesFinancieres = makeRelanceGarantiesFinancieres({
   eventBus: eventStore,
   findProjectsWithGarantiesFinancieresPendingBefore:
@@ -77,7 +71,6 @@ const useCases = Object.freeze({
   listUnnotifiedProjects,
   getUserProject,
   shouldUserAccessProject,
-  relanceInvitations,
   relanceGarantiesFinancieres,
 })
 
@@ -90,6 +83,5 @@ export {
   listUnnotifiedProjects,
   getUserProject,
   shouldUserAccessProject,
-  relanceInvitations,
   relanceGarantiesFinancieres,
 }

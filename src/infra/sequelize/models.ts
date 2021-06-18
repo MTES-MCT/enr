@@ -15,7 +15,7 @@ import { MakePeriodeModel } from './projections/appelOffre/periode.model'
 import { MakeUserDrealModel } from './projections/userDreal/userDreal.model'
 import { EventBus } from '../../modules/eventStore'
 
-const models = {
+export const models = {
   File: MakeFileModel(sequelizeInstance),
   Notification: MakeNotificationModel(sequelizeInstance),
   Project: MakeProjectModel(sequelizeInstance),

@@ -43,6 +43,8 @@ export const MakeUserModel = (sequelize) => {
 
   User.associate = (models) => {
     // Add belongsTo etc. statements here
+    const { Project } = models
+    User.hasMany(Project, { as: 'candidateProjects', foreignKey: 'email', sourceKey: 'email' })
   }
 
   User.projector = userProjector

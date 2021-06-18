@@ -30,9 +30,10 @@ import {
   makeCreateUser,
   makeInviteUserToProject,
   makeRegisterFirstUserLogin,
+  makeRelanceInvitation,
 } from '../modules/users'
 import { buildCertificate } from '../views/certificates'
-import { createUserCredentials, getUserName } from './credentials.config'
+import { createUserCredentials, getUserName, resendInvitationEmail } from './credentials.config'
 import { eventStore } from './eventStore.config'
 import {
   getAppelOffreList,
@@ -174,6 +175,11 @@ export const inviteUserToProject = makeInviteUserToProject({
 export const registerFirstUserLogin = makeRegisterFirstUserLogin({
   userRepo,
   getUserName,
+})
+
+export const relanceInvitation = makeRelanceInvitation({
+  eventBus: eventStore,
+  resendInvitationEmail,
 })
 
 export const cancelModificationRequest = makeCancelModificationRequest({
