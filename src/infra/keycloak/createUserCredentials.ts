@@ -53,7 +53,7 @@ export const createUserCredentials = (args: {
         clientId: KEYCLOAK_USER_CLIENT_ID,
         actions,
         realm: KEYCLOAK_REALM,
-        redirectUri: BASE_URL + routes.REGISTRATION_CALLBACK,
+        redirectUri: BASE_URL + routes.REDIRECT_BASED_ON_ROLE,
         lifespan: ONE_MONTH,
       })
     }
