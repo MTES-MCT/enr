@@ -161,7 +161,7 @@ export const MakeProjectModel = (sequelize) => {
   )
 
   Project.associate = (models) => {
-    const { File, UserProjects, ProjectAdmissionKey, ProjectStep } = models
+    const { File, UserProjects, ProjectStep } = models
     Project.belongsTo(File, {
       foreignKey: 'garantiesFinancieresFileId',
       as: 'garantiesFinancieresFileRef',
@@ -179,19 +179,6 @@ export const MakeProjectModel = (sequelize) => {
 
     Project.hasMany(UserProjects, {
       as: 'users',
-    })
-
-    // All invitations for this specific project
-    Project.hasMany(ProjectAdmissionKey, {
-      as: 'invitations',
-      foreignKey: 'projectId',
-    })
-
-    // All invitations for same email
-    Project.hasMany(ProjectAdmissionKey, {
-      as: 'invitationsForProjectEmail',
-      foreignKey: 'email',
-      sourceKey: 'email',
     })
 
     Project.hasOne(ProjectStep, {

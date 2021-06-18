@@ -23,10 +23,6 @@ export const MakeUserModel = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      projectAdmissionKey: {
-        type: DataTypes.UUID,
-        allowNull: true,
-      },
       registeredOn: {
         type: DataTypes.DATE,
         allowNull: true,

@@ -10,7 +10,6 @@ import { makeGetFailedNotificationsForRetry } from './getFailedNotificationsForR
 import { makeGetFailedNotificationDetails } from './getFailedNotificationDetails'
 import { makeGetModificationRequestListForUser } from './getModificationRequestListForUser'
 import { makeGetInfoForModificationRequested } from './getInfoForModificationRequested'
-import { makeGetProjectIdForAdmissionKey } from './getProjectIdForAdmissionKey'
 import { makeGetProjectDataForProjectPage } from './getProjectDataForProjectPage'
 import { makeGetProjectIdsForPeriode } from './getProjectIdsForPeriode'
 import { makeGetModificationRequestDataForResponseTemplate } from './getModificationRequestDataForResponseTemplate'
@@ -44,7 +43,6 @@ export { getStats } from './getStats'
 export const getFailedNotificationsForRetry = makeGetFailedNotificationsForRetry(models)
 export const getFailedNotificationDetails = makeGetFailedNotificationDetails(models)
 export const getInfoForModificationRequested = makeGetInfoForModificationRequested(models)
-export const getProjectIdForAdmissionKey = makeGetProjectIdForAdmissionKey(models)
 export const getProjectDataForProjectPage = makeGetProjectDataForProjectPage(models)
 export const getProjectIdsForPeriode = makeGetProjectIdsForPeriode(models)
 export const getProjectsByContactEmail = makeGetProjectsByContactEmail(models)

@@ -8,7 +8,6 @@ import { MakeUserModel } from './projections/user/user.model'
 import { MakeProjectStepModel } from './projections/projectStep/projectStep.model'
 
 import { MakeUserProjectsModel } from './projections/userProjects/userProjects.model'
-import { MakeProjectAdmissionKeyModel } from './projections/projectAdmissionKey/projectAdmissionKey.model'
 import { MakeModificationRequestModel } from './projections/modificationRequest/modificationRequest.model'
 import { MakeAppelOffreModel } from './projections/appelOffre/appelOffre.model'
 import { MakePeriodeModel } from './projections/appelOffre/periode.model'
@@ -23,7 +22,6 @@ export const models = {
   ModificationRequest: MakeModificationRequestModel(sequelizeInstance),
   User: MakeUserModel(sequelizeInstance),
   UserProjects: MakeUserProjectsModel(sequelizeInstance),
-  ProjectAdmissionKey: MakeProjectAdmissionKeyModel(sequelizeInstance),
   ProjectStep: MakeProjectStepModel(sequelizeInstance),
   AppelOffre: MakeAppelOffreModel(sequelizeInstance),
   Periode: MakePeriodeModel(sequelizeInstance),

@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler'
-import { projectAdmissionKeyRepo, userRepo } from '../../dataAccess'
+import { userRepo } from '../../dataAccess'
 import routes from '../../routes'
 import { AdminUsersPage } from '../../views/pages'
 import { ensureRole } from '../auth'

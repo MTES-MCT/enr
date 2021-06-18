@@ -1,7 +1,6 @@
 import { Request } from 'express'
 import React from 'react'
-import { DREAL, ProjectAdmissionKey, REGIONS, User } from '../../entities'
-import { formatDate } from '../../helpers/formatDate'
+import { DREAL, REGIONS, User } from '../../entities'
 import { dataId } from '../../helpers/testId'
 import ROUTES from '../../routes'
 import AdminDashboard from '../components/adminDashboard'

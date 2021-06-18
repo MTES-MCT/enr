@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import React from 'react'
-import { ProjectAdmissionKey, User } from '../../entities'
+import { User } from '../../entities'
 import { formatDate } from '../../helpers/formatDate'
 import { dataId } from '../../helpers/testId'
 import routes from '../../routes'

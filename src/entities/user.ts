@@ -1,6 +1,6 @@
 import isEmail from 'isemail'
-import { String, Record, Union, Literal, Partial, Static, Boolean } from '../types/schemaTypes'
 import buildMakeEntity from '../helpers/buildMakeEntity'
+import { Boolean, Literal, Record, Static, String, Union } from '../types/schemaTypes'
 
 export const USER_ROLES = [
   'admin',
@@ -11,7 +11,7 @@ export const USER_ROLES = [
   'ademe',
 ] as const
 
-const baseUserSchema = Record({
+const userSchema = Record({
   id: String,
   fullName: String,
   email: String.withConstraint(isEmail.validate),
@@ -26,13 +26,7 @@ const baseUserSchema = Record({
   isRegistered: Boolean,
 })
 
-const userSchema = baseUserSchema.And(
-  Partial({
-    projectAdmissionKey: String,
-  })
-)
-
-const fields: string[] = ['projectAdmissionKey', ...Object.keys(baseUserSchema.fields)]
+const fields: string[] = [...Object.keys(userSchema.fields)]
 
 type User = Static<typeof userSchema>
 

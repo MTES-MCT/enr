@@ -10,7 +10,6 @@ import isDbReady from './helpers/isDbReady'
 // Override these to apply serialization/deserialization on inputs/outputs
 const deserialize = (item) => ({
   ...item,
-  projectAdmissionKey: item.projectAdmissionKey || undefined,
   fullName: item.fullName || '',
   isRegistered: !!item.registeredOn,
 })
@@ -33,10 +32,6 @@ export default function makeUserRepo({ sequelizeInstance }): UserRepo {
     role: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    projectAdmissionKey: {
-      type: DataTypes.UUID,
-      allowNull: true,
     },
     registeredOn: {
       type: DataTypes.DATE,

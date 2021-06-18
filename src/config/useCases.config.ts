@@ -1,10 +1,5 @@
-import { fromOldResultAsync, logger } from '../core/utils'
 import { makeImportAppelOffreData, makeImportPeriodeData } from '../modules/appelOffre/useCases'
-import {
-  BaseShouldUserAccessProject,
-  makeCancelInvitationToProject,
-  makeRevokeRightsToProject,
-} from '../modules/authorization'
+import { BaseShouldUserAccessProject, makeRevokeRightsToProject } from '../modules/authorization'
 import { makeLoadFileForUser } from '../modules/file'
 import {
   makeAcceptModificationRequest,
@@ -25,7 +20,6 @@ import {
   makeSubmitStep,
   makeUpdateStepStatus,
 } from '../modules/project/useCases'
-import { InfraNotAvailableError } from '../modules/shared'
 import {
   makeCreateUser,
   makeInviteUserToProject,
@@ -38,7 +32,6 @@ import { eventStore } from './eventStore.config'
 import {
   getAppelOffreList,
   getFileProject,
-  getProjectIdForAdmissionKey,
   getProjectIdsForPeriode,
   getProjectsByContactEmail,
   getUserByEmail,
@@ -101,12 +94,6 @@ export const confirmRequest = makeConfirmRequest({
 export const revokeUserRightsToProject = makeRevokeRightsToProject({
   eventBus: eventStore,
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
-})
-
-export const cancelInvitationToProject = makeCancelInvitationToProject({
-  eventBus: eventStore,
-  shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
-  getProjectIdForAdmissionKey,
 })
 
 export const submitStep = makeSubmitStep({
