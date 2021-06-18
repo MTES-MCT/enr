@@ -21,6 +21,7 @@ import AdminRegenerateCertificates from './adminRegenerateCertificates'
 import AdminAppelOffre from './adminAppelOffre'
 import AdminUsers from './adminUsers'
 import Success from './success'
+import InvitationsAreDeprecated from './invitationsAreDeprecated'
 import { Request } from 'express'
 
 const AdminNotifyCandidatesPage = makePresenterPage(AdminNotifyCandidates)
@@ -38,6 +39,7 @@ const ModificationRequestListPage = makePresenterPage(ModificationRequestList)
 const SuccessPage = makePresenterPage(Success)
 const AdminAppelOffrePage = makePresenterPage(AdminAppelOffre)
 const AdminUsersPage = makePresenterPage(AdminUsers)
+const InvitationsAreDeprecatedPage = makePresenterPage(InvitationsAreDeprecated)
 
 export {
   ImportCandidatesPage,
@@ -55,6 +57,7 @@ export {
   SuccessPage,
   AdminAppelOffrePage,
   AdminUsersPage,
+  InvitationsAreDeprecatedPage,
 }
 
 interface HasRequest {
