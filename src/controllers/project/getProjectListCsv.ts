@@ -6,7 +6,7 @@ import { parseAsync } from 'json2csv'
 import { logger } from '../../core/utils'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { promises as fsPromises } from 'fs'
 import moment from 'moment'
 import { Project } from '../../entities'
@@ -558,7 +558,6 @@ function _selectFieldsForRole(userRole: string): { label: string; value: string 
 
 v1Router.get(
   routes.DOWNLOAD_PROJECTS_CSV,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet', 'acheteur-obligé']),
   getProjectListCsv
 )

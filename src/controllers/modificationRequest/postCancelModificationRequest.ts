@@ -3,12 +3,11 @@ import { cancelModificationRequest } from '../../config'
 import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.ANNULER_DEMANDE_ACTION,
-  ensureLoggedIn(),
   ensureRole(['porteur-projet']),
   asyncHandler(async (request, response) => {
     const { modificationRequestId } = request.body

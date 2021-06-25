@@ -3,13 +3,12 @@ import { UniqueEntityID } from '../../core/domain'
 import { FileAccessDeniedError, FileNotFoundError } from '../../modules/file'
 import { InfraNotAvailableError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
 v1Router.get(
   routes.DOWNLOAD_PROJECT_FILE(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal', 'porteur-projet']),
   asyncHandler(async (request, response) => {
     const { fileId } = request.params

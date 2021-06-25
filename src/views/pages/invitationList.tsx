@@ -1,103 +1,55 @@
+import { Request } from 'express'
 import React from 'react'
-import { AppelOffre, ProjectAdmissionKey } from '../../entities'
+import { AppelOffre } from '../../entities'
 import { formatDate } from '../../helpers/formatDate'
 import { dataId } from '../../helpers/testId'
+import { PendingCandidateInvitationDTO } from '../../modules/candidateNotification'
 import ROUTES from '../../routes'
 import { PaginatedList } from '../../types'
-import { Request } from 'express'
 import AdminDashboard from '../components/adminDashboard'
 import Pagination from '../components/pagination'
 interface InvitationListProps {
   request: Request
-  invitations: PaginatedList<ProjectAdmissionKey>
-  appelsOffre: Array<AppelOffre>
+  invitations: PaginatedList<PendingCandidateInvitationDTO>
 }
 
 /* Pure component */
-export default function InvitationList({ request, invitations, appelsOffre }: InvitationListProps) {
-  const { error, success, appelOffreId, periodeId } = (request.query as any) || {}
+export default function InvitationList({ request, invitations }: InvitationListProps) {
+  const { error, success } = (request.query as any) || {}
 
   return (
     <AdminDashboard role={request.user?.role} currentPage="list-invitations">
       <div className="panel">
         <div className="panel__header">
-          <h3>Invitations en cours</h3>
-          <p>Sont listées uniquement les invitations qui n‘ont pas donné lieu à une inscription</p>
+          <h3>Invitations en attente</h3>
+          <p>
+            Sont listées uniquement les invitations de candidats qui n‘ont pas donné lieu à une
+            inscription. Les parrainnages ne sont pas inclus.
+          </p>
         </div>
-        <div className="panel__header">
-          <form
-            action={ROUTES.ADMIN_INVITATION_RELANCE_ACTION}
-            method="POST"
-            style={{ maxWidth: 'auto', margin: '0 0 25px 0' }}
-          >
-            <div className="form__group">
-              <legend>Filtrer par AO, Période et/ou Famille</legend>
-              <select name="appelOffreId" {...dataId('appelOffreIdSelector')}>
-                <option value="">Tous AO</option>
-                {appelsOffre.map((appelOffre) => (
-                  <option
-                    key={'appel_' + appelOffre.id}
-                    value={appelOffre.id}
-                    selected={appelOffre.id === appelOffreId}
-                  >
-                    {appelOffre.shortTitle}
-                  </option>
-                ))}
-              </select>
-              <select name="periodeId" {...dataId('periodeIdSelector')}>
-                <option value="">Toutes périodes</option>
-                {appelsOffre
-                  .find((ao) => ao.id === appelOffreId)
-                  ?.periodes.map((periode) => (
-                    <option
-                      key={'appel_' + periode.id}
-                      value={periode.id}
-                      selected={periode.id === periodeId}
-                    >
-                      {periode.title}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            {invitations.itemCount ? (
-              <button
-                className="button"
-                type="submit"
-                name="submit"
-                id="submit"
-                style={{ marginTop: 10 }}
-                {...dataId('submit-button')}
-              >
-                Relancer les {invitations.itemCount} invitations de cette période
-              </button>
-            ) : (
-              ''
-            )}
-          </form>
-          {success ? (
-            <div className="notification success" {...dataId('success-message')}>
-              {success}
-            </div>
-          ) : (
-            ''
-          )}
-          {error ? (
-            <div className="notification error" {...dataId('error-message')}>
-              {error}
-            </div>
-          ) : (
-            ''
-          )}
-        </div>
+        {success ? (
+          <div className="notification success" {...dataId('success-message')}>
+            {success}
+          </div>
+        ) : (
+          ''
+        )}
+        {error ? (
+          <div className="notification error" {...dataId('error-message')}>
+            {error}
+          </div>
+        ) : (
+          ''
+        )}
 
         <div className="pagination__count">
-          <strong>{invitations.itemCount}</strong> invitations{' '}
+          <strong>{invitations.itemCount}</strong> invitations en attente{' '}
         </div>
         {!invitations.items.length ? (
           <table className="table">
             <tbody>
               <tr>
-                <td>Aucune invitation à lister</td>
+                <td>Aucune</td>
               </tr>
             </tbody>
           </table>
@@ -114,7 +66,7 @@ export default function InvitationList({ request, invitations, appelsOffre }: In
               <tbody>
                 {invitations.items.map((invitation) => {
                   return (
-                    <tr key={'invitation_' + invitation.id} {...dataId('invitationList-item')}>
+                    <tr key={'invitation_' + invitation.email} {...dataId('invitationList-item')}>
                       <td>
                         {invitation.email}{' '}
                         {invitation.fullName ? (
@@ -132,8 +84,8 @@ export default function InvitationList({ request, invitations, appelsOffre }: In
                         )}
                       </td>
                       <td>
-                        {invitation.createdAt
-                          ? formatDate(invitation.createdAt, 'DD/MM/YYYY HH:mm')
+                        {invitation.invitedOn
+                          ? formatDate(invitation.invitedOn, 'DD/MM/YYYY HH:mm')
                           : ''}
                       </td>
                       <td>
@@ -142,9 +94,7 @@ export default function InvitationList({ request, invitations, appelsOffre }: In
                           method="POST"
                           style={{}}
                         >
-                          <select name="keys" multiple hidden>
-                            <option value={invitation.id} selected></option>
-                          </select>
+                          <input type="hidden" name="email" value={invitation.email} />
                           <button
                             className="button-outline primary"
                             type="submit"

@@ -27,22 +27,9 @@ class routes {
   static HOME = '/'
   static LOGIN = '/login.html'
   static STATS = '/stats.html'
-  static LOGIN_ACTION = '/login'
   static LOGOUT_ACTION = '/logout'
-  static FORGOTTEN_PASSWORD = '/mot-de-passe-oublie.html'
-  static FORGOTTEN_PASSWORD_ACTION = '/retrieve-password'
-  static RESET_PASSWORD_LINK = withParams<{
-    resetCode: string
-  }>('/recuperation-mot-de-passe.html')
 
-  static RESET_PASSWORD_ACTION = '/reset-password'
   static REDIRECT_BASED_ON_ROLE = '/go-to-user-dashboard'
-  static SIGNUP = '/enregistrement.html'
-  static SIGNUP_ACTION = '/enregistrement'
-  static PROJECT_INVITATION = withParams<{
-    projectAdmissionKey: string
-  }>('/enregistrement.html')
-
   static ADMIN_DASHBOARD = '/admin/dashboard.html'
 
   static ADMIN_AO_PERIODE = '/admin/appels-offres.html'
@@ -53,9 +40,8 @@ class routes {
 
   static ADMIN_USERS = '/admin/utilisateurs.html'
   static ADMIN_INVITE_USER_ACTION = '/admin/inviterUtilisateur'
-  static USER_INVITATION = withParams<{
-    projectAdmissionKey: string
-  }>('/enregistrement.html')
+
+  static USER_INVITATION = '/enregistrement.html'
 
   static IMPORT_PROJECTS = '/admin/importer-candidats.html' // Keep separate from ADMIN_DASHBOARD, may change
 
@@ -150,10 +136,6 @@ class routes {
   static ADMIN_NOTIFY_CANDIDATES_ACTION = '/admin/sendCandidateNotifications'
   static ADMIN_CORRECT_PROJECT_DATA_ACTION = '/admin/correctProjectData'
   static ADMIN_REPLY_TO_MODIFICATION_REQUEST = '/admin/replyToModificationRequest'
-  static ADMIN_INVITE_DREAL_ACTION = '/admin/inviteDreal'
-  static DREAL_INVITATION = withParams<{
-    projectAdmissionKey: string
-  }>('/enregistrement.html')
 
   static ADMIN_DREAL_LIST = '/admin/dreals.html'
   static ADMIN_INVITATION_LIST = '/admin/invitations.html'
@@ -268,11 +250,6 @@ class routes {
     projectId: string
     userId: string
   }>('/retirer-droits')
-
-  static CANCEL_INVITATION_TO_PROJECT_ACTION = withParams<{
-    projectAdmissionKeyId: string
-    projectId: string
-  }>('/annuler-invitation')
 }
 
 export default routes

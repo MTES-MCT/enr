@@ -10,8 +10,8 @@ import isDbReady from './helpers/isDbReady'
 // Override these to apply serialization/deserialization on inputs/outputs
 const deserialize = (item) => ({
   ...item,
-  projectAdmissionKey: item.projectAdmissionKey || undefined,
   fullName: item.fullName || '',
+  isRegistered: !!item.registeredOn,
 })
 const serialize = (item) => item
 
@@ -33,7 +33,11 @@ export default function makeUserRepo({ sequelizeInstance }): UserRepo {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    projectAdmissionKey: {
+    registeredOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    keycloakId: {
       type: DataTypes.UUID,
       allowNull: true,
     },
@@ -170,7 +174,7 @@ export default function makeUserRepo({ sequelizeInstance }): UserRepo {
         'User.findAll.deserialize error'
       )
 
-      return mapIfOk(deserializedItems, makeUser, 'User.findAll.makeUser error')
+      return deserializedItems
     } catch (error) {
       if (CONFIG.logDbErrors) logger.error(error)
       return []

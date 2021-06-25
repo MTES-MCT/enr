@@ -2,7 +2,11 @@ import asyncHandler from 'express-async-handler'
 import os from 'os'
 import path from 'path'
 import sanitize from 'sanitize-filename'
-import { eventStore, getModificationRequestDataForResponseTemplate, userRepo } from '../../config'
+import {
+  eventStore,
+  getModificationRequestDataForResponseTemplate,
+  oldUserRepo,
+} from '../../config'
 import { ModificationRequest, User } from '../../entities'
 import { fillDocxTemplate } from '../../helpers/fillDocxTemplate'
 import {
@@ -12,12 +16,11 @@ import {
 import { EntityNotFoundError } from '../../modules/shared'
 import routes from '../../routes'
 import { shouldUserAccessProject } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.get(
   routes.TELECHARGER_MODELE_REPONSE(),
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec', 'dreal']),
   asyncHandler(async (request, response) => {
     const { projectId, modificationRequestId } = request.params
@@ -107,7 +110,7 @@ async function makeResponseTemplate(
 
   let imageToInject = ''
   if (user.role === 'dreal') {
-    const userDreals = await userRepo.findDrealsForUser(user.id)
+    const userDreals = await oldUserRepo.findDrealsForUser(user.id)
     if (userDreals.length) {
       const dreal = userDreals[0]
       imageToInject = path.resolve(__dirname, '../../public/images/dreals', `${dreal}.png`)

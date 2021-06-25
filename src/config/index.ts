@@ -1,10 +1,11 @@
-import './eventHandlers'
-import './projections.config'
-export * from './emails.config'
-export * from './env.config'
-export * from './eventStore.config'
-export * from './fileStorage.config'
-export * from './queries.config'
-export * from './repos.config'
-export * from './useCases.config'
-export * from './logger.config'
+export * from './eventHandlers';
+export * from './credentials.config';
+export * from './emails.config';
+export * from './env.config';
+export * from './eventStore.config';
+export * from './fileStorage.config';
+export * from './logger.config';
+export * from './projections.config';
+export * from './queries.config';
+export * from './repos.config';
+export * from './useCases.config';

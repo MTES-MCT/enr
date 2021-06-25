@@ -1,5 +1,5 @@
 import models from '../models'
-import { userRepo } from '../../../config/repos.config'
+import { oldUserRepo } from '../../../config/repos.config'
 import { makeGetUnnotifiedProjectsForPeriode } from './getUnnotifiedProjectsForPeriode'
 import { makeGetModificationRequestDetails } from './getModificationRequestDetails'
 import { makeGetModificationRequestStatus } from './getModificationRequestStatus'
@@ -10,7 +10,6 @@ import { makeGetFailedNotificationsForRetry } from './getFailedNotificationsForR
 import { makeGetFailedNotificationDetails } from './getFailedNotificationDetails'
 import { makeGetModificationRequestListForUser } from './getModificationRequestListForUser'
 import { makeGetInfoForModificationRequested } from './getInfoForModificationRequested'
-import { makeGetProjectIdForAdmissionKey } from './getProjectIdForAdmissionKey'
 import { makeGetProjectDataForProjectPage } from './getProjectDataForProjectPage'
 import { makeGetProjectIdsForPeriode } from './getProjectIdsForPeriode'
 import { makeGetModificationRequestDataForResponseTemplate } from './getModificationRequestDataForResponseTemplate'
@@ -20,6 +19,7 @@ import { makeGetPeriodeList } from './getPeriodeList'
 import { makeGetAppelOffreList } from './getAppelOffreList'
 import { makeGetUserByEmail } from './getUserByEmail'
 import { makeGetModificationRequestRecipient } from './getModificationRequestRecipient'
+import { makeGetProjectsByContactEmail } from './getProjectsByContactEmail'
 
 export const getAppelOffre = makeGetAppelOffre(models)
 export const getAppelOffreList = makeGetAppelOffreList(models)
@@ -42,15 +42,17 @@ export const getFileProject = makeGetFileProject(models)
 export const getFailedNotificationsForRetry = makeGetFailedNotificationsForRetry(models)
 export const getFailedNotificationDetails = makeGetFailedNotificationDetails(models)
 export const getInfoForModificationRequested = makeGetInfoForModificationRequested(models)
-export const getProjectIdForAdmissionKey = makeGetProjectIdForAdmissionKey(models)
 export const getProjectDataForProjectPage = makeGetProjectDataForProjectPage(models)
 export const getProjectIdsForPeriode = makeGetProjectIdsForPeriode(models)
+export const getProjectsByContactEmail = makeGetProjectsByContactEmail(models)
 export const getModificationRequestDataForResponseTemplate = makeGetModificationRequestDataForResponseTemplate(
   {
     models,
     getPeriode,
-    findDrealsForUser: userRepo['findDrealsForUser'],
+    findDrealsForUser: oldUserRepo['findDrealsForUser'],
     dgecEmail: process.env.DGEC_EMAIL || '',
   }
 )
 export const getModificationRequestRecipient = makeGetModificationRequestRecipient(models)
+
+export * from './candidateNotification'

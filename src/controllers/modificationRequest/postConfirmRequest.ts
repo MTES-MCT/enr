@@ -4,12 +4,11 @@ import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { AggregateHasBeenUpdatedSinceError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.CONFIRMER_DEMANDE_ACTION,
-  ensureLoggedIn(),
   ensureRole(['porteur-projet']),
   asyncHandler(async (request, response) => {
     const { modificationRequestId, versionDate } = request.body

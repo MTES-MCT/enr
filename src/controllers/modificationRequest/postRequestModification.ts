@@ -7,7 +7,7 @@ import { pathExists } from '../../helpers/pathExists'
 import { isStrictlyPositiveNumber } from '../../helpers/formValidators'
 import routes from '../../routes'
 import { requestModification, shouldUserAccessProject } from '../../useCases'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 import {
@@ -52,7 +52,6 @@ const returnRoute = (type, projectId) => {
 
 v1Router.post(
   routes.DEMANDE_ACTION,
-  ensureLoggedIn(),
   ensureRole('porteur-projet'),
   upload.single('file'),
   asyncHandler(async (request, response) => {

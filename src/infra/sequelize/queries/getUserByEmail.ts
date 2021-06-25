@@ -1,8 +1,6 @@
-import { UniqueEntityID } from '../../../core/domain'
-import { err, errAsync, logger, ok, Result, wrapInfra } from '../../../core/utils'
-import { makeUser, User } from '../../../entities'
-import { GetAppelOffre } from '../../../modules/appelOffre'
-import { EntityNotFoundError, InfraNotAvailableError } from '../../../modules/shared'
+import { ok, Result, wrapInfra } from '../../../core/utils'
+import { User } from '../../../entities'
+import { InfraNotAvailableError } from '../../../modules/shared'
 import { GetUserByEmail } from '../../../modules/users/queries'
 
 export const makeGetUserByEmail = (models): GetUserByEmail => (email) => {
@@ -12,7 +10,10 @@ export const makeGetUserByEmail = (models): GetUserByEmail => (email) => {
     (userRaw: any): Result<User | null, InfraNotAvailableError> => {
       if (!userRaw) return ok(null)
 
-      return ok(userRaw.get() as User)
+      const user = userRaw.get()
+      user.isRegistered = !!user.registeredOn
+
+      return ok(user)
     }
   )
 }

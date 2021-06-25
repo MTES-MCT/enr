@@ -6,15 +6,11 @@ import ReactDOMServer from 'react-dom/server'
 import Header from '../components/header'
 import Footer from '../components/footer'
 
-import Login from './login'
 import ListProjects from './listProjects'
 import AdminNotifyCandidates from './adminNotifyCandidates'
 import ImportCandidates from './importCandidates'
-import Signup from './signup'
 import NewModificationRequest from './newModificationRequest'
 import ModificationRequestDetails from './modificationRequestDetails'
-import ForgottenPassword from './forgottenPassword'
-import ResetPassword from './resetPassword'
 import ProjectDetails from './projectDetails'
 import DrealList from './drealList'
 import InvitationList from './invitationList'
@@ -25,17 +21,14 @@ import AdminRegenerateCertificates from './adminRegenerateCertificates'
 import AdminAppelOffre from './adminAppelOffre'
 import AdminUsers from './adminUsers'
 import Success from './success'
+import InvitationsAreDeprecated from './invitationsAreDeprecated'
 import { Request } from 'express'
 
-const LoginPage = makePresenterPage(Login)
 const AdminNotifyCandidatesPage = makePresenterPage(AdminNotifyCandidates)
 const AdminRegenerateCertificatesPage = makePresenterPage(AdminRegenerateCertificates)
 const ImportCandidatesPage = makePresenterPage(ImportCandidates)
 const ListProjectsPage = makePresenterPage(ListProjects)
-const SignupPage = makePresenterPage(Signup)
 const NewModificationRequestPage = makePresenterPage(NewModificationRequest)
-const ForgottenPasswordPage = makePresenterPage(ForgottenPassword)
-const ResetPasswordPage = makePresenterPage(ResetPassword)
 const ProjectDetailsPage = makePresenterPage(ProjectDetails)
 const DrealListPage = makePresenterPage(DrealList)
 const InvitationListPage = makePresenterPage(InvitationList)
@@ -46,17 +39,14 @@ const ModificationRequestListPage = makePresenterPage(ModificationRequestList)
 const SuccessPage = makePresenterPage(Success)
 const AdminAppelOffrePage = makePresenterPage(AdminAppelOffre)
 const AdminUsersPage = makePresenterPage(AdminUsers)
+const InvitationsAreDeprecatedPage = makePresenterPage(InvitationsAreDeprecated)
 
 export {
-  LoginPage,
   ImportCandidatesPage,
   ListProjectsPage,
-  SignupPage,
   NewModificationRequestPage,
   AdminNotifyCandidatesPage,
   AdminRegenerateCertificatesPage,
-  ForgottenPasswordPage,
-  ResetPasswordPage,
   ProjectDetailsPage,
   DrealListPage,
   InvitationListPage,
@@ -67,6 +57,7 @@ export {
   SuccessPage,
   AdminAppelOffrePage,
   AdminUsersPage,
+  InvitationsAreDeprecatedPage,
 }
 
 interface HasRequest {

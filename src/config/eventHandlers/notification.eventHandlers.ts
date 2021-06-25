@@ -6,13 +6,14 @@ import {
   handleModificationRequestConfirmed,
   handleModificationRequestCancelled,
   handleModificationReceived,
+  handleUserInvitedToProject,
 } from '../../modules/notification'
 import {
   ProjectCertificateRegenerated,
   ProjectCertificateUpdated,
   ProjectGFSubmitted,
 } from '../../modules/project/events'
-import { projectRepo, oldProjectRepo } from '../repos.config'
+import { projectRepo, oldProjectRepo, oldUserRepo } from '../repos.config'
 import {
   getModificationRequestInfoForStatusNotification,
   getModificationRequestInfoForConfirmedNotification,
@@ -31,7 +32,7 @@ import {
   ModificationRequestCancelled,
   ModificationReceived,
 } from '../../modules/modificationRequest'
-import { userRepo } from '../../dataAccess'
+import { UserInvitedToProject } from '../../modules/authorization'
 
 const projectCertificateChangeHandler = handleProjectCertificateUpdatedOrRegenerated({
   sendNotification,
@@ -75,8 +76,8 @@ eventStore.subscribe(
   ProjectGFSubmitted.type,
   handleProjectGFSubmitted({
     sendNotification,
-    findUsersForDreal: userRepo.findUsersForDreal,
-    findUserById: userRepo.findById,
+    findUsersForDreal: oldUserRepo.findUsersForDreal,
+    findUserById: oldUserRepo.findById,
     findProjectById: oldProjectRepo.findById,
   })
 )
@@ -90,7 +91,7 @@ eventStore.subscribe(
   ModificationRequestCancelled.type,
   handleModificationRequestCancelled({
     sendNotification,
-    findUsersForDreal: userRepo.findUsersForDreal,
+    findUsersForDreal: oldUserRepo.findUsersForDreal,
     getModificationRequestInfo: getModificationRequestInfoForStatusNotification,
     getModificationRequestRecipient,
     dgecEmail: process.env.DGEC_EMAIL,
@@ -101,8 +102,17 @@ eventStore.subscribe(
   ModificationReceived.type,
   handleModificationReceived({
     sendNotification,
-    findUsersForDreal: userRepo.findUsersForDreal,
-    findUserById: userRepo.findById,
+    findUsersForDreal: oldUserRepo.findUsersForDreal,
+    findUserById: oldUserRepo.findById,
+    findProjectById: oldProjectRepo.findById,
+  })
+)
+
+eventStore.subscribe(
+  UserInvitedToProject.type,
+  handleUserInvitedToProject({
+    sendNotification,
+    findUserById: oldUserRepo.findById,
     findProjectById: oldProjectRepo.findById,
   })
 )

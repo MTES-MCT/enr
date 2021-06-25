@@ -48,8 +48,7 @@ type IsNotified = {
     id: string
     filename: string
   }
-} & Users &
-  Invitations
+} & Users
 
 type IsClasse = {
   isClasse: true
@@ -134,12 +133,6 @@ type Users = {
     id: string
     fullName: string
     email: string
-  }>
-}
-
-type Invitations = {
-  invitations: Array<{
-    id: string
-    email: string
+    isRegistered: boolean
   }>
 }

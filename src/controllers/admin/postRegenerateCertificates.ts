@@ -1,17 +1,16 @@
-import { logger } from '../../core/utils'
+import asyncHandler from 'express-async-handler'
 import moment from 'moment-timezone'
+import { regenerateCertificatesForPeriode } from '../../config/useCases.config'
+import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import routes from '../../routes'
-import { regenerateCertificatesForPeriode } from '../../config/useCases.config'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 const FORMAT_DATE = 'DD/MM/YYYY'
 
 v1Router.post(
   routes.ADMIN_REGENERATE_CERTIFICATES_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
     const {

@@ -1,131 +1,7 @@
-import {
-  CredentialsRepo,
-  UserRepo,
-  ProjectAdmissionKeyRepo,
-  ModificationRequestRepo,
-  PasswordRetrievalRepo,
-} from '../'
-import {
-  Credentials,
-  User,
-  Project,
-  ProjectAdmissionKey,
-  ModificationRequest,
-  PasswordRetrieval,
-  DREAL,
-} from '../../entities'
-import { Ok, Err, Some, None, ErrorResult, Pagination, PaginatedList } from '../../types'
-import { makePaginatedList } from '../../helpers/paginate'
-
+import { ModificationRequestRepo, UserRepo } from '../'
+import { DREAL, ModificationRequest, Project, User } from '../../entities'
+import { Err, ErrorResult, None, Ok, Some } from '../../types'
 import { appelOffreRepo } from './appelOffre'
-
-let credentialsByEmail: Record<string, Credentials> = {}
-const credentialsById: Record<string, Credentials> = {}
-const credentialsRepo: CredentialsRepo = {
-  findByEmail: (email: string) => {
-    if (email in credentialsByEmail) {
-      return Promise.resolve(Some(credentialsByEmail[email]))
-    } else return Promise.resolve(None)
-  },
-  insert: (credentials: Credentials) => {
-    credentialsByEmail[credentials.email] = credentials
-    credentialsById[credentials.id] = credentials
-    return Promise.resolve(Ok(credentials))
-  },
-  update: (id: Credentials['id'], hash: Credentials['hash']) => {
-    if (!credentialsById[id]) {
-      return Promise.resolve(ErrorResult('Cannot update credentials that was unknown'))
-    }
-
-    credentialsById[id].hash = hash
-
-    return Promise.resolve(Ok(credentialsById[id]))
-  },
-}
-
-let projectAdmissionKeysById: Record<string, ProjectAdmissionKey> = {}
-
-const projectAdmissionKeyRepo: ProjectAdmissionKeyRepo = {
-  findById: async (id: string) => {
-    if (id in projectAdmissionKeysById) {
-      return Some(projectAdmissionKeysById[id])
-    } else return None
-  },
-  findAll: async (query?: Record<string, any>): Promise<Array<ProjectAdmissionKey>> => {
-    const allItems = Object.values(projectAdmissionKeysById)
-
-    if (!query) {
-      return allItems
-    }
-
-    const items = allItems.filter((item) =>
-      Object.entries(query).every(([key, value]) => {
-        if (key === 'dreal' && value === -1) {
-          return !!item.dreal
-        }
-
-        if (key === 'dreal' && value === null) {
-          return !item.dreal
-        }
-
-        if (key === 'projectId' && value === null) {
-          return !item.projectId
-        }
-
-        if (key === 'createdAt' && typeof value === 'object' && typeof value.before === 'number') {
-          return typeof item.createdAt !== 'undefined' && item.createdAt <= value.before
-        }
-
-        return item[key] === value
-      })
-    )
-
-    return items
-  },
-  getList: async (
-    query: Record<string, any>,
-    pagination: Pagination
-  ): Promise<PaginatedList<ProjectAdmissionKey>> => {
-    const allItems = Object.values(projectAdmissionKeysById)
-
-    let items = allItems.filter((item) =>
-      Object.entries(query).every(([key, value]) => {
-        if (key === 'dreal' && value === -1) {
-          return !!item.dreal
-        }
-
-        if (key === 'dreal' && value === null) {
-          return !item.dreal
-        }
-
-        if (key === 'projectId' && value === null) {
-          return !item.projectId
-        }
-
-        if (key === 'createdAt' && typeof value === 'object' && typeof value.before === 'number') {
-          return typeof item.createdAt !== 'undefined' && item.createdAt <= value.before
-        }
-
-        return item[key] === value
-      })
-    )
-
-    const { page, pageSize } = pagination
-    const offset = page * pageSize
-    const limit = pageSize
-
-    const pageCount = Math.ceil(items.length / pagination.pageSize)
-
-    items = items.slice(offset, offset + limit)
-
-    return makePaginatedList(items, pageCount, pagination)
-  },
-  save: async (item: ProjectAdmissionKey) => {
-    projectAdmissionKeysById[item.id] = item
-
-    return Ok(null)
-  },
-}
 
 let usersById: Record<string, User> = {}
 let userProjects: Record<User['id'], Array<Project['id']>> = {}
@@ -250,50 +126,11 @@ const modificationRequestRepo: ModificationRequestRepo = {
   },
 }
 
-let passwordRetrievalsById: Record<string, PasswordRetrieval> = {}
-const passwordRetrievalRepo: PasswordRetrievalRepo = {
-  findById: async (id: string) => {
-    if (id in passwordRetrievalsById) {
-      return Some(passwordRetrievalsById[id])
-    } else return None
-  },
-  insert: async (item: PasswordRetrieval) => {
-    passwordRetrievalsById[item.id] = item
-
-    return Ok(item)
-  },
-  remove: async (id: string) => {
-    if (!passwordRetrievalsById[id]) {
-      return ErrorResult('Cannot delete unknown item')
-    }
-
-    delete passwordRetrievalsById[id]
-
-    return Ok(null)
-  },
-  countSince: async (email: string, since: number) => {
-    return Object.values(passwordRetrievalsById).filter(
-      (item) => item.email === email && item.createdOn >= since
-    ).length
-  },
-}
-
 const resetDatabase = () => {
-  credentialsByEmail = {}
   usersById = {}
   userProjects = {}
-  projectAdmissionKeysById = {}
   modificationRequestsById = {}
-  passwordRetrievalsById = {}
 }
 
-export {
-  credentialsRepo,
-  userRepo,
-  projectAdmissionKeyRepo,
-  modificationRequestRepo,
-  passwordRetrievalRepo,
-  appelOffreRepo,
-  resetDatabase,
-}
 export * from './appelOffre'
+export { userRepo, modificationRequestRepo, appelOffreRepo, resetDatabase }

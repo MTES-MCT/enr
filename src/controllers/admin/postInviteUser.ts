@@ -1,43 +1,75 @@
+import asyncHandler from 'express-async-handler'
+import { createUser, eventStore } from '../../config'
 import { REGIONS } from '../../entities'
 import { addQueryParams } from '../../helpers/addQueryParams'
+import { DrealUserInvited } from '../../modules/authorization'
+import { PartnerUserInvited } from '../../modules/authorization/events/PartnerUserInvited'
 import routes from '../../routes'
-import { inviteUser } from '../../config'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 v1Router.post(
   routes.ADMIN_INVITE_USER_ACTION,
-  ensureLoggedIn(),
   ensureRole('admin'),
   asyncHandler(async (request, response) => {
-    const { email, role } = request.body
-    const { user } = request
+    const { email, role, region } = request.body
 
-    if (!['acheteur-obligé'].includes(role)) {
+    const redirectTo = request.get('Referrer')
+
+    if (!['acheteur-obligé', 'dreal'].includes(role)) {
       return response.redirect(
-        addQueryParams(routes.ADMIN_USERS, {
+        addQueryParams(redirectTo, {
           error: 'Le role attendu n‘est pas reconnu.',
         })
       )
     }
 
+    if (role === 'dreal' && !REGIONS.includes(region)) {
+      return response.redirect(
+        addQueryParams(redirectTo, {
+          error: 'Cette DREAL n‘est pas reconnue.',
+        })
+      )
+    }
+
     ;(
-      await inviteUser({
+      await createUser({
         email: email.toLowerCase(),
-        forRole: role,
-        invitedBy: user,
+        role,
+        createdBy: request.user,
+      }).andThen((userId) => {
+        if (role === 'dreal') {
+          return eventStore.publish(
+            new DrealUserInvited({
+              payload: {
+                userId,
+                region,
+                invitedBy: request.user.id,
+              },
+            })
+          )
+        }
+
+        return eventStore.publish(
+          new PartnerUserInvited({
+            payload: {
+              userId,
+              role,
+              invitedBy: request.user.id,
+            },
+          })
+        )
       })
     ).match(
       () =>
         response.redirect(
-          addQueryParams(routes.ADMIN_USERS, {
+          addQueryParams(redirectTo, {
             success: `Une invitation a bien été envoyée à ${email}`,
           })
         ),
       (error: Error) =>
         response.redirect(
-          addQueryParams(routes.ADMIN_USERS, {
+          addQueryParams(redirectTo, {
             error: error.message,
           })
         )

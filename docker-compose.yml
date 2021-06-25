@@ -8,5 +8,6 @@ services:
       - POSTGRES_PASSWORD=localpwd
       - POSTGRES_DB=potentiel
     restart: always
+    container_name: potentiel_db_dev
     ports:
       - 5432:5432

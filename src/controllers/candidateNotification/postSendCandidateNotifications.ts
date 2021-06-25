@@ -5,7 +5,7 @@ import { logger } from '../../core/utils'
 import { addQueryParams } from '../../helpers/addQueryParams'
 import { PeriodeNotified } from '../../modules/project/events'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 import asyncHandler from 'express-async-handler'
 
@@ -13,7 +13,6 @@ const FORMAT_DATE = 'DD/MM/YYYY'
 
 v1Router.post(
   routes.ADMIN_NOTIFY_CANDIDATES_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin', 'dgec']),
   asyncHandler(async (request, response) => {
     const { appelOffreId, periodeId, notificationDate } = request.body

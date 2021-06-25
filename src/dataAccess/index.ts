@@ -10,9 +10,6 @@ if (process.env.NODE_ENV === 'test' && process.env.TEST === 'unit') {
 export * from './db'
 
 export * from './user'
-export * from './credentials'
 export * from './project'
-export * from './projectAdmissionKey'
 export * from './modificationRequest'
 export * from './appelOffre'
-export * from './passwordRetrieval'

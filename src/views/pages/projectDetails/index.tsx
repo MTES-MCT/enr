@@ -65,9 +65,15 @@ export default function ProjectDetails({ request, project }: ProjectDetailsProps
               <div>
                 <h5 style={{ marginBottom: 5, marginTop: 15 }}>Comptes ayant accès à ce projet</h5>
                 <ul style={{ marginTop: 5, marginBottom: 5 }}>
-                  {project.users.map(({ id, fullName, email }) => (
+                  {project.users.map(({ id, fullName, email, isRegistered }) => (
                     <li key={'project_user_' + id}>
-                      {fullName} - {email}
+                      {fullName && `${fullName} - `}
+                      {email}
+                      {!isRegistered && (
+                        <span style={{ fontStyle: 'italic', marginLeft: 5 }}>
+                          (invitation en attente)
+                        </span>
+                      )}
                       {id !== user.id ? (
                         <a
                           href={ROUTES.REVOKE_USER_RIGHTS_TO_PROJECT_ACTION({
@@ -84,38 +90,7 @@ export default function ProjectDetails({ request, project }: ProjectDetailsProps
                       )}
                     </li>
                   ))}
-                  {project.invitations.map(({ id, email }) => (
-                    <li key={'project_invitation_' + email}>
-                      {email} (
-                      {user.role === 'admin' ? (
-                        <a
-                          href={ROUTES.PROJECT_INVITATION({
-                            projectAdmissionKey: id,
-                          })}
-                        >
-                          invitation envoyée
-                        </a>
-                      ) : (
-                        <i>invitation envoyée</i>
-                      )}
-                      )
-                      {email !== project.email ? (
-                        <a
-                          href={ROUTES.CANCEL_INVITATION_TO_PROJECT_ACTION({
-                            projectAdmissionKeyId: id,
-                            projectId: project.id,
-                          })}
-                          style={{ marginLeft: 5 }}
-                          data-confirm={`Etes-vous sur de vouloir annuler l‘invitation à ${email} ?`}
-                        >
-                          annuler
-                        </a>
-                      ) : (
-                        ''
-                      )}
-                    </li>
-                  ))}
-                  {!project.users.length && !project.invitations.length ? (
+                  {!project.users.length ? (
                     <>
                       <li>Aucun utilisateur n‘a accès à ce projet pour le moment.</li>
                     </>

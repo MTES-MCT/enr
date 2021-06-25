@@ -1,12 +1,12 @@
+import asyncHandler from 'express-async-handler'
 import { getFailedNotificationDetails } from '../../config'
 import { logger } from '../../core/utils'
 import { makePagination } from '../../helpers/paginate'
 import routes from '../../routes'
 import { Pagination } from '../../types'
 import { NotificationListPage } from '../../views/pages'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 const defaultPagination: Pagination = {
   page: 0,
@@ -15,7 +15,6 @@ const defaultPagination: Pagination = {
 
 v1Router.get(
   routes.ADMIN_NOTIFICATION_LIST,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
     const pagination = makePagination(request.query, defaultPagination)

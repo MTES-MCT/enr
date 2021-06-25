@@ -18,19 +18,8 @@ type BaseNotification = {
 type Designation = {
   type: 'designation'
   context: {
-    projectAdmissionKeyId: string
     appelOffreId: string
     periodeId: string
-  }
-  variables: {
-    invitation_link: string
-  }
-}
-
-type RelanceDesignation = {
-  type: 'relance-designation'
-  context: {
-    projectAdmissionKeyId: string
   }
   variables: {
     invitation_link: string
@@ -40,9 +29,8 @@ type RelanceDesignation = {
 type ProjectInvitation = {
   type: 'project-invitation'
   context: {
-    projectAdmissionKeyId?: string
     userId?: string
-    projectId: string
+    projectIds: string[]
   }
   variables: {
     invitation_link: string
@@ -69,17 +57,6 @@ type UserInvitation = {
   }
   variables: {
     invitation_link: string
-  }
-}
-
-type PasswordReset = {
-  type: 'password-reset'
-  context: {
-    passwordRetrievalId: string
-    userId: string
-  }
-  variables: {
-    password_reset_link: string
   }
 }
 
@@ -212,11 +189,9 @@ type ModificationRequestCancelled = {
 
 type NotificationVariants =
   | Designation
-  | RelanceDesignation
   | ProjectInvitation
   | DrealInvitation
   | UserInvitation
-  | PasswordReset
   | PP_GF_Notification
   | DREAL_GF_Notification
   | RelanceGarantiesFinancieres

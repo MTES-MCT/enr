@@ -1,33 +1,12 @@
-import makeLogin from './login'
+import { eventStore, fileRepo, sendNotification } from '../config'
+import { appelOffreRepo, projectRepo, userRepo } from '../dataAccess'
+import makeGetUserProject from './getUserProject'
 import makeImportProjects from './importProjects'
 import makeListProjects from './listProjects'
-import makeSignup from './signup'
-import makeRequestModification from './requestModification'
 import makeListUnnotifiedProjects from './listUnnotifiedProjects'
-import makeGetUserProject from './getUserProject'
-import makeRetrievePassword from './retrievePassword'
-import makeResetPassword from './resetPassword'
-import makeShouldUserAccessProject from './shouldUserAccessProject'
-import makeInviteUserToProject from './inviteUserToProject'
-import makeInviteDreal from './inviteDreal'
-import makeRelanceInvitations from './relanceInvitations'
 import makeRelanceGarantiesFinancieres from './relanceGarantiesFinancieres'
-
-import { fileRepo, sendNotification, eventStore } from '../config'
-
-import {
-  credentialsRepo,
-  userRepo,
-  projectRepo,
-  projectAdmissionKeyRepo,
-  appelOffreRepo,
-  passwordRetrievalRepo,
-} from '../dataAccess'
-
-const login = makeLogin({
-  credentialsRepo,
-  userRepo,
-})
+import makeRequestModification from './requestModification'
+import makeShouldUserAccessProject from './shouldUserAccessProject'
 
 const importProjects = makeImportProjects({
   eventBus: eventStore,
@@ -64,14 +43,6 @@ const shouldUserAccessProject = makeShouldUserAccessProject({
   findProjectById: projectRepo.findById,
 })
 
-const signup = makeSignup({
-  userRepo,
-  addUserToProjectsWithEmail: userRepo.addUserToProjectsWithEmail,
-  addUserToProject: userRepo.addProject,
-  credentialsRepo,
-  projectAdmissionKeyRepo,
-})
-
 const requestModification = makeRequestModification({
   fileRepo,
   eventBus: eventStore,
@@ -81,38 +52,6 @@ const requestModification = makeRequestModification({
 const getUserProject = makeGetUserProject({
   findProjectById: projectRepo.findById,
   shouldUserAccessProject,
-})
-
-const retrievePassword = makeRetrievePassword({
-  credentialsRepo,
-  passwordRetrievalRepo,
-  sendNotification,
-})
-
-const resetPassword = makeResetPassword({
-  credentialsRepo,
-  passwordRetrievalRepo,
-})
-
-const inviteUserToProject = makeInviteUserToProject({
-  findProjectById: projectRepo.findById,
-  credentialsRepo,
-  userRepo,
-  projectAdmissionKeyRepo,
-  shouldUserAccessProject,
-  sendNotification,
-})
-
-const inviteDreal = makeInviteDreal({
-  credentialsRepo,
-  projectAdmissionKeyRepo,
-  userRepo,
-  sendNotification,
-})
-
-const relanceInvitations = makeRelanceInvitations({
-  projectAdmissionKeyRepo,
-  sendNotification,
 })
 
 const relanceGarantiesFinancieres = makeRelanceGarantiesFinancieres({
@@ -125,38 +64,24 @@ const relanceGarantiesFinancieres = makeRelanceGarantiesFinancieres({
 })
 
 const useCases = Object.freeze({
-  login,
   importProjects,
   listProjects,
   sendNotification,
-  signup,
   requestModification,
   listUnnotifiedProjects,
   getUserProject,
-  retrievePassword,
-  resetPassword,
   shouldUserAccessProject,
-  inviteUserToProject,
-  inviteDreal,
-  relanceInvitations,
   relanceGarantiesFinancieres,
 })
 
 export default useCases
 export {
-  login,
   importProjects,
   listProjects,
   sendNotification,
-  signup,
   requestModification,
   listUnnotifiedProjects,
   getUserProject,
-  retrievePassword,
-  resetPassword,
   shouldUserAccessProject,
-  inviteUserToProject,
-  inviteDreal,
-  relanceInvitations,
   relanceGarantiesFinancieres,
 }

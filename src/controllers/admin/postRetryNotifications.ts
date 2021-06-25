@@ -1,12 +1,11 @@
 import asyncHandler from 'express-async-handler'
 import { retryFailedNotifications } from '../../config'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
 
 v1Router.post(
   routes.ADMIN_NOTIFICATION_RETRY_ACTION,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
     const notificationsRetried = await retryFailedNotifications()

@@ -17,7 +17,7 @@ import {
 } from '../../modules/modificationRequest'
 import { AggregateHasBeenUpdatedSinceError } from '../../modules/shared'
 import routes from '../../routes'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
 
@@ -25,7 +25,7 @@ const FORMAT_DATE = 'DD/MM/YYYY'
 
 v1Router.post(
   routes.ADMIN_REPLY_TO_MODIFICATION_REQUEST,
-  ensureLoggedIn(),
+
   upload.single('file'),
   ensureRole(['admin', 'dgec']),
   asyncHandler(async (request, response) => {

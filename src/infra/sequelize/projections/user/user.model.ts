@@ -1,4 +1,7 @@
 import { DataTypes } from 'sequelize'
+import { makeProjector } from '../../helpers'
+
+export const userProjector = makeProjector()
 
 export const MakeUserModel = (sequelize) => {
   const User = sequelize.define(
@@ -20,7 +23,11 @@ export const MakeUserModel = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      projectAdmissionKey: {
+      registeredOn: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      keycloakId: {
         type: DataTypes.UUID,
         allowNull: true,
       },
@@ -32,7 +39,11 @@ export const MakeUserModel = (sequelize) => {
 
   User.associate = (models) => {
     // Add belongsTo etc. statements here
+    const { Project } = models
+    User.hasMany(Project, { as: 'candidateProjects', foreignKey: 'email', sourceKey: 'email' })
   }
+
+  User.projector = userProjector
 
   return User
 }

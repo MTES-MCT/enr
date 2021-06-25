@@ -3,11 +3,10 @@ import { resetDatabase } from '../helpers'
 import makeFakeProject from '../../../__tests__/fixtures/project'
 import makeFakeUser from '../../../__tests__/fixtures/user'
 import makeFakeFile from '../../../__tests__/fixtures/file'
-import { makeUser } from '../../../entities'
 import { UniqueEntityID } from '../../../core/domain'
 import { makeGetProjectDataForProjectPage } from './getProjectDataForProjectPage'
 
-const { Project, File, User, UserProjects, ProjectAdmissionKey, ProjectStep } = models
+const { Project, File, User, UserProjects, ProjectStep } = models
 const certificateFileId = new UniqueEntityID().toString()
 
 const projectId = new UniqueEntityID().toString()
@@ -49,7 +48,7 @@ const projectInfo = {
   motifsElimination: 'motifsElimination',
 }
 
-const user = makeUser(makeFakeUser({ role: 'admin' })).unwrap()
+const user = makeFakeUser({ role: 'admin', id: new UniqueEntityID().toString() })
 
 describe('Sequelize getProjectDataForProjectPage', () => {
   const getProjectDataForProjectPage = makeGetProjectDataForProjectPage(models)
@@ -127,87 +126,41 @@ describe('Sequelize getProjectDataForProjectPage', () => {
 
   it('should include a list of users that have access to this project', async () => {
     const userId = new UniqueEntityID().toString()
+    const userId2 = new UniqueEntityID().toString()
 
     await resetDatabase()
 
     await Project.create(makeFakeProject(projectInfo))
-    await User.create(makeFakeUser({ id: userId, fullName: 'username', email: 'user@test.test' }))
+    await User.create(
+      makeFakeUser({
+        id: userId,
+        fullName: 'username',
+        email: 'user@test.test',
+        registeredOn: new Date(123),
+      })
+    )
+    await User.create(
+      makeFakeUser({
+        id: userId2,
+        fullName: 'username',
+        email: 'user2@test.test',
+      })
+    )
     await UserProjects.create({
       userId,
+      projectId,
+    })
+    await UserProjects.create({
+      userId: userId2,
       projectId,
     })
 
     const res = await getProjectDataForProjectPage({ projectId, user })
 
     expect(res._unsafeUnwrap()).toMatchObject({
-      users: [{ id: userId, fullName: 'username', email: 'user@test.test' }],
-    })
-  })
-
-  it('should include a list of pending invitations to this project', async () => {
-    const invitationId1 = new UniqueEntityID().toString()
-    const invitationId2 = new UniqueEntityID().toString()
-
-    await resetDatabase()
-
-    await Project.create(makeFakeProject(projectInfo))
-    await ProjectAdmissionKey.bulkCreate([
-      {
-        id: invitationId1,
-        projectId,
-        email: 'invitation@test.test',
-        fullName: '',
-        lastUsedAt: 0,
-        cancelled: false,
-      },
-      {
-        // Invitation for project but already used
-        id: new UniqueEntityID().toString(),
-        projectId,
-        email: 'other@test.test',
-        fullName: '',
-        lastUsedAt: 1,
-      },
-      {
-        // Invitation for project but cancelled
-        id: new UniqueEntityID().toString(),
-        projectId,
-        email: 'other@test.test',
-        fullName: '',
-        cancelled: true,
-      },
-      {
-        // Invitation for project email
-        id: invitationId2,
-        email: 'test@test.test',
-        fullName: '',
-        lastUsedAt: 0,
-        cancelled: false,
-      },
-      {
-        // Invitation for project email but already used
-        id: new UniqueEntityID().toString(),
-        email: 'test@test.test',
-        fullName: '',
-        lastUsedAt: 1,
-        cancelled: false,
-      },
-      {
-        // Invitation for project email but cancelled
-        id: new UniqueEntityID().toString(),
-        email: 'test@test.test',
-        fullName: '',
-        lastUsedAt: 0,
-        cancelled: true,
-      },
-    ])
-
-    const res = await getProjectDataForProjectPage({ projectId, user })
-
-    expect(res._unsafeUnwrap()).toMatchObject({
-      invitations: [
-        { id: invitationId1, email: 'invitation@test.test' },
-        { id: invitationId2, email: 'test@test.test' },
+      users: [
+        { id: userId, fullName: 'username', email: 'user@test.test', isRegistered: true },
+        { id: userId2, fullName: 'username', email: 'user2@test.test', isRegistered: false },
       ],
     })
   })
@@ -335,7 +288,7 @@ describe('Sequelize getProjectDataForProjectPage', () => {
   })
 
   describe('when user is dreal', () => {
-    const user = makeUser(makeFakeUser({ role: 'dreal' })).unwrap()
+    const user = makeFakeUser({ role: 'dreal' })
 
     beforeAll(async () => {
       await resetDatabase()

@@ -1,11 +1,12 @@
-import { appelOffreRepo, projectAdmissionKeyRepo } from '../../dataAccess'
+import asyncHandler from 'express-async-handler'
+import { getPendingCandidateInvitations } from '../../config'
+import { addQueryParams } from '../../helpers/addQueryParams'
 import { makePagination } from '../../helpers/paginate'
 import routes from '../../routes'
 import { Pagination } from '../../types'
 import { InvitationListPage } from '../../views/pages'
-import { ensureLoggedIn, ensureRole } from '../auth'
+import { ensureRole } from '../auth'
 import { v1Router } from '../v1Router'
-import asyncHandler from 'express-async-handler'
 
 const defaultPagination: Pagination = {
   page: 0,
@@ -14,27 +15,21 @@ const defaultPagination: Pagination = {
 
 v1Router.get(
   routes.ADMIN_INVITATION_LIST,
-  ensureLoggedIn(),
   ensureRole(['admin']),
   asyncHandler(async (request, response) => {
-    const { appelOffreId, periodeId } = request.query as any
-
     const pagination = makePagination(request.query, defaultPagination)
 
-    const appelsOffre = await appelOffreRepo.findAll()
-
-    // Get all projectAdmissionKeys that have not been used
-    const invitations = await projectAdmissionKeyRepo.getList(
-      {
-        lastUsedAt: 0,
-        dreal: null,
-        projectId: null,
-        ...(appelOffreId ? { appelOffreId } : {}),
-        ...(periodeId ? { periodeId } : {}),
+    await getPendingCandidateInvitations(pagination).match(
+      (invitations) => {
+        return response.send(InvitationListPage({ request, invitations }))
       },
-      pagination
+      () => {
+        return response.redirect(
+          addQueryParams(routes.ADMIN_DASHBOARD, {
+            error: "La liste des invitations en attente n'a pas pu être générée.",
+          })
+        )
+      }
     )
-
-    return response.send(InvitationListPage({ request, invitations, appelsOffre }))
   })
 )

@@ -9,18 +9,16 @@ import {
 } from '../../modules/project/events'
 import { sendNotification } from '../emails.config'
 import { eventStore } from '../eventStore.config'
-import {
-  oldAppelOffreRepo,
-  candidateNotificationRepo,
-  oldProjectAdmissionKeyRepo,
-} from '../repos.config'
+import { getUserByEmail } from '../queries.config'
+import { candidateNotificationRepo, oldAppelOffreRepo } from '../repos.config'
+import { createUser } from '../useCases.config'
 
 eventStore.subscribe(
   CandidateNotifiedForPeriode.type,
   handleCandidateNotifiedForPeriode({
-    eventBus: eventStore,
     sendNotification,
-    saveProjectAdmissionKey: oldProjectAdmissionKeyRepo.save,
+    createUser,
+    getUserByEmail,
     getPeriodeTitle: oldAppelOffreRepo.getPeriodeTitle,
   })
 )

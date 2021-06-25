@@ -1,4 +1,7 @@
 import { DataTypes } from 'sequelize'
+import { makeProjector } from '../../helpers'
+
+export const userProjectsProjector = makeProjector()
 
 export const MakeUserProjectsModel = (sequelize) => {
   const UserProjects = sequelize.define(
@@ -25,6 +28,8 @@ export const MakeUserProjectsModel = (sequelize) => {
 
     UserProjects.belongsTo(User, { foreignKey: 'userId' })
   }
+
+  UserProjects.projector = userProjectsProjector
 
   return UserProjects
 }

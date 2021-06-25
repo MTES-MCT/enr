@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  keycloak:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./themes:/opt/jboss/keycloak/themes
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: test
+      KEYCLOAK_WELCOME_THEME: potentiel
+      KEYCLOAK_DEFAULT_THEME: potentiel
+      POTENTIEL_BASE_URL: http://localhost:3000
+      # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+      #JDBC_PARAMS: "ssl=true"
+    ports:
+      - 8000:8080

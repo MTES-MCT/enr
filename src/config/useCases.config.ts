@@ -1,54 +1,55 @@
-import {
-  BaseShouldUserAccessProject,
-  makeRevokeRightsToProject,
-  makeCancelInvitationToProject,
-} from '../modules/authorization'
+import { makeImportAppelOffreData, makeImportPeriodeData } from '../modules/appelOffre/useCases'
+import { BaseShouldUserAccessProject, makeRevokeRightsToProject } from '../modules/authorization'
 import { makeLoadFileForUser } from '../modules/file'
+import {
+  makeAcceptModificationRequest,
+  makeCancelModificationRequest,
+  makeConfirmRequest,
+  makeRejectModificationRequest,
+  makeRequestActionnaireModification,
+  makeRequestConfirmation,
+  makeRequestFournisseursModification,
+  makeRequestProducteurModification,
+  makeRequestPuissanceModification,
+  makeUpdateModificationRequestStatus,
+} from '../modules/modificationRequest'
+import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
 import {
   makeCorrectProjectData,
   makeGenerateCertificate,
-  makeSubmitStep,
-  makeRemoveStep,
   makeRegenerateCertificatesForPeriode,
+  makeRemoveStep,
+  makeSubmitStep,
   makeUpdateStepStatus,
 } from '../modules/project/useCases'
-import { makeImportAppelOffreData, makeImportPeriodeData } from '../modules/appelOffre/useCases'
+import {
+  makeCreateUser,
+  makeInviteUserToProject,
+  makeRegisterFirstUserLogin,
+  makeRelanceInvitation,
+} from '../modules/users'
 import { buildCertificate } from '../views/certificates'
-import {
-  fileRepo,
-  oldProjectRepo,
-  projectRepo,
-  userRepo,
-  modificationRequestRepo,
-  appelOffreRepo,
-  projectAdmissionKeyRepo,
-} from './repos.config'
-import {
-  getFileProject,
-  getProjectIdForAdmissionKey,
-  getProjectIdsForPeriode,
-  getAppelOffreList,
-  getUserByEmail,
-} from './queries.config'
+import { createUserCredentials, getUserName, resendInvitationEmail } from './credentials.config'
 import { eventStore } from './eventStore.config'
 import {
-  makeAcceptModificationRequest,
-  makeRejectModificationRequest,
-  makeRequestPuissanceModification,
-  makeRequestActionnaireModification,
-  makeRequestProducteurModification,
-  makeUpdateModificationRequestStatus,
-  makeRequestConfirmation,
-  makeConfirmRequest,
-  makeCancelModificationRequest,
-} from '../modules/modificationRequest'
-import { getAutoAcceptRatiosForAppelOffre } from '../modules/modificationRequest/helpers'
-import { makeInviteUser } from '../modules/users'
-import { sendNotification } from './emails.config'
-import { makeRequestFournisseursModification } from '../modules/modificationRequest/useCases/requestFournisseursModification'
+  getAppelOffreList,
+  getFileProject,
+  getProjectIdsForPeriode,
+  getProjectsByContactEmail,
+  getUserByEmail,
+} from './queries.config'
+import {
+  appelOffreRepo,
+  fileRepo,
+  modificationRequestRepo,
+  oldProjectRepo,
+  oldUserRepo,
+  projectRepo,
+  userRepo,
+} from './repos.config'
 
 export const shouldUserAccessProject = new BaseShouldUserAccessProject(
-  userRepo,
+  oldUserRepo,
   oldProjectRepo.findById
 )
 
@@ -95,12 +96,6 @@ export const confirmRequest = makeConfirmRequest({
 export const revokeUserRightsToProject = makeRevokeRightsToProject({
   eventBus: eventStore,
   shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
-})
-
-export const cancelInvitationToProject = makeCancelInvitationToProject({
-  eventBus: eventStore,
-  shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
-  getProjectIdForAdmissionKey,
 })
 
 export const submitStep = makeSubmitStep({
@@ -166,10 +161,28 @@ export const importPeriodeData = makeImportPeriodeData({
   appelOffreRepo,
 })
 
-export const inviteUser = makeInviteUser({
-  projectAdmissionKeyRepo,
+export const createUser = makeCreateUser({
   getUserByEmail,
-  sendNotification,
+  createUserCredentials,
+  eventBus: eventStore,
+  getProjectsByContactEmail,
+})
+
+export const inviteUserToProject = makeInviteUserToProject({
+  getUserByEmail,
+  shouldUserAccessProject: shouldUserAccessProject.check.bind(shouldUserAccessProject),
+  eventBus: eventStore,
+  createUser,
+})
+
+export const registerFirstUserLogin = makeRegisterFirstUserLogin({
+  userRepo,
+  getUserName,
+})
+
+export const relanceInvitation = makeRelanceInvitation({
+  eventBus: eventStore,
+  resendInvitationEmail,
 })
 
 export const cancelModificationRequest = makeCancelModificationRequest({
