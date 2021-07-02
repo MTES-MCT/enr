@@ -4,6 +4,7 @@ import { addQueryParams } from '../../helpers/addQueryParams'
 import { parseCsv } from '../../helpers/parseCsv'
 import routes from '../../routes'
 import { importProjects } from '../../useCases'
+import { ImportCandidatesPage } from '../../views/pages'
 import { ensureLoggedIn, ensureRole } from '../auth'
 import { upload } from '../upload'
 import { v1Router } from '../v1Router'
@@ -41,7 +42,7 @@ v1Router.post(
     ).match({
       ok: (result) => {
         const { unnotifiedProjects, savedProjects } = result || {}
-        return response.redirect(
+        response.redirect(
           addQueryParams(routes.IMPORT_PROJECTS, {
             success: savedProjects
               ? `${savedProjects} projet(s) ont bien été importé(s) ou mis à jour${
@@ -52,10 +53,11 @@ v1Router.post(
         )
       },
       err: (e: Error) => {
-        logger.error(e)
-        return response.redirect(
-          addQueryParams(routes.IMPORT_PROJECTS, {
-            error: e.message.length > 1000 ? e.message.substring(0, 1000) + '...' : e.message,
+        // logger.error(e)
+        response.send(
+          ImportCandidatesPage({
+            request,
+            importError: e.message,
           })
         )
       },

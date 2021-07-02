@@ -2,6 +2,7 @@ import { Result, Ok, ErrorResult } from '../types'
 import { Runtype } from '../types/schemaTypes'
 import { Optional } from 'utility-types'
 import _ from 'lodash'
+import { logger } from '../core/utils'
 
 interface HasId {
   id: string
@@ -43,6 +44,7 @@ const buildMakeEntity = <T extends HasId>(
     try {
       return Ok(schema.check(onlyTypeFields))
     } catch (error) {
+      logger.error(error)
       return ErrorResult(`${error.message} in field ${error.key}`)
     }
   }
