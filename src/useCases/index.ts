@@ -23,6 +23,7 @@ import {
   appelOffreRepo,
   passwordRetrievalRepo,
 } from '../dataAccess'
+import makeClaimProjects from './claimProjects'
 
 const login = makeLogin({
   credentialsRepo,
@@ -111,6 +112,13 @@ const inviteDreal = makeInviteDreal({
   sendNotification,
 })
 
+const claimProjects = makeClaimProjects({
+  credentialsRepo,
+  projectAdmissionKeyRepo,
+  userRepo,
+  sendNotification,
+})
+
 const relanceInvitations = makeRelanceInvitations({
   projectAdmissionKeyRepo,
   sendNotification,
@@ -141,6 +149,7 @@ const useCases = Object.freeze({
   inviteDreal,
   relanceInvitations,
   relanceGarantiesFinancieres,
+  claimProjects,
 })
 
 export default useCases
@@ -160,4 +169,5 @@ export {
   inviteDreal,
   relanceInvitations,
   relanceGarantiesFinancieres,
+  claimProjects,
 }

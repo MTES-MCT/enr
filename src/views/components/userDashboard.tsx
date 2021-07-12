@@ -3,7 +3,7 @@ import ROUTES from '../../routes'
 
 interface UserDashboardProps {
   children: React.ReactNode
-  currentPage: 'list-projects' | 'list-requests' | undefined
+  currentPage: 'list-projects' | 'list-requests' | 'list-missing-owner-projects' | undefined
 }
 
 /* Pure component */
@@ -41,6 +41,14 @@ export default function UserDashboard({ children, currentPage }: UserDashboardPr
                 className={currentPage === 'list-requests' ? 'active' : ''}
               >
                 Mes demandes
+              </a>
+            </li>
+            <li>
+              <a
+                href={ROUTES.USER_LIST_MISSING_OWNER_PROJECTS}
+                className={currentPage === 'list-missing-owner-projects' ? 'active' : ''}
+              >
+                Projets avant Avril 2020
               </a>
             </li>
           </ul>

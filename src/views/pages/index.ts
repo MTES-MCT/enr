@@ -26,6 +26,7 @@ import AdminAppelOffre from './adminAppelOffre'
 import AdminUsers from './adminUsers'
 import Success from './success'
 import { Request } from 'express'
+import ListMissingOwnerProjects from './listMissingOwnerProjects'
 
 const LoginPage = makePresenterPage(Login)
 const AdminNotifyCandidatesPage = makePresenterPage(AdminNotifyCandidates)
@@ -46,6 +47,7 @@ const ModificationRequestListPage = makePresenterPage(ModificationRequestList)
 const SuccessPage = makePresenterPage(Success)
 const AdminAppelOffrePage = makePresenterPage(AdminAppelOffre)
 const AdminUsersPage = makePresenterPage(AdminUsers)
+const ListMissingOwnerProjectsPage = makePresenterPage(ListMissingOwnerProjects)
 
 export {
   LoginPage,
@@ -67,6 +69,7 @@ export {
   SuccessPage,
   AdminAppelOffrePage,
   AdminUsersPage,
+  ListMissingOwnerProjectsPage,
 }
 
 interface HasRequest {
